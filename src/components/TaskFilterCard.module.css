@@ -1,0 +1,18 @@
+.taskItem {
+  border: 0;
+  border-radius: 5px;
+  padding: 7px;
+  margin: 5px;
+  text-decoration: none;
+}
+.taskItem:hover {
+  background-color: #e6e5fa;
+  color: #4d46e1;
+  cursor: pointer;
+  border: 5px;
+}
+
+.taskBadge{
+  background-color: #4d46e1;
+  color: white;
+}

@@ -1,0 +1,9 @@
+.sidebarItem{
+  color: #000 !important;
+}
+.sidebarItem:hover{
+  background-color: #e6e5fa !important;
+  border-radius: 8px !important;
+  color: #4d46e1 !important;
+
+}

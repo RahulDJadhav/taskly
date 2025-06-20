@@ -1,0 +1,72 @@
+import React, { useState, useEffect } from 'react';
+import styles from './TodoListCard.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar as farStar } from '@fortawesome/free-regular-svg-icons';
+import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
+import TaskOptions from './TaskOptions';
+import TaskTextToggle from './TaskTextToggle';
+
+const TodoListCard = ({ data, onEdit, onDelete }) => {
+
+  // const [tasks, setTasks] = useState(data);
+
+  // useEffect(() => {
+  //   const storedTasks = localStorage.getItem('todoTasks');
+  //   if (storedTasks) {
+  //     setTasks(JSON.parse(storedTasks));
+  //   }
+  // }, []);
+
+  if (data.length === 0) {
+    return <div className="row d-flex align-items-center">
+      <div className="col text-center">
+        <p className="text-muted">No tasks available. Please add a new task.</p>
+      </div>
+    </div>;
+  }
+
+  // const handleEdit = (task) => {
+  //   alert(`Edit Task: ${task.taskTitle}`);
+  //   // TODO: Pass task data to a modal for editing
+  // };
+
+  // const handleDelete = (taskId) => {
+  //   alert(`Delete Task ID: ${taskId}`);
+  //   // TODO: Pass taskId to parent for deletion
+  // };
+
+  return (
+    <div className="container">
+      {data.map(task => (
+        <div key={task.id} className={`row d-flex align-items-center mb-3 ${styles.todoList}`}>
+          <div className="col-md-1">
+            <div className="form-check d-flex align-items-center">
+              <input
+                className={`form-check-input me-2 ${styles.checkbox}`}
+                type="checkbox"
+                id={`check-${task.id}`}
+              />
+              <FontAwesomeIcon icon={farStar} className="me-2" />
+            </div>
+          </div>
+          <div className="col-md-10 d-flex  justify-content-evenly">
+            <span className={`fw-semibold `}>{task.title}</span>
+            <span className={`text-muted small me-3 `}>{task.dueDate}</span>
+            <span className={`text-muted small me-3 `}><TaskTextToggle text={task.description} maxLength={20} /></span>
+            <span className={`badge bg-secondary `}>{task.priority}</span>
+            <span className={`text-muted small `}>{task.status}</span>
+            <span className={`text-muted small `}>{task.assignee}</span>
+          </div>
+          <div className="col-md-1 d-flex justify-content-end">
+            <TaskOptions
+              onEdit={() => onEdit && onEdit(task)}
+              onDelete={() => onDelete && onDelete(task.id)}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default TodoListCard;

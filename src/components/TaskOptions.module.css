@@ -1,0 +1,24 @@
+.actionBtn:hover{
+  background-color: #e6e5fa !important;
+  border-radius: 8px !important;
+  color: #4d46e1 !important;
+  cursor: pointer !important;
+  width: 100% !important;
+  padding: 5px !important;
+}
+
+.dropdownItemDiv {
+  right: 0;
+  zIndex: 10;
+  width: 120px;
+  position: absolute;
+  color: #4d46e1;
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 5px;  
+}
+
+.actionBtn{
+  width: 100%;
+  padding: 5px;
+}

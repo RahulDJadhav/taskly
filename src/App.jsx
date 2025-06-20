@@ -1,0 +1,105 @@
+import React, { useState, useRef, useEffect } from 'react';
+import Header from './components/Header';
+import Sidebar from './components/Sidebar';
+import MainContent from './components/MainContent';
+import Footer from './components/Footer';
+import CreateTaskForm from './components/CreateTaskForm';
+import './App.css';
+
+const App = () => {
+  const [tasks, setTasks] = useState([]);
+  const [editingTask, setEditingTask] = useState(null);
+  const formRef = useRef();
+
+
+  useEffect(() => {
+    const storedTasks = localStorage.getItem('todoTasks');
+    console.log('Loaded from storage:', storedTasks);
+    if (storedTasks) {
+      setTasks(JSON.parse(storedTasks));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('todoTasks', JSON.stringify(tasks));
+    console.log('Saved to storage:', tasks);
+  }, [tasks]);
+
+  // CREATE
+  const handleAddTask = (newTask) => {
+    setTasks((prevTasks) => [...prevTasks, newTask]);
+  };
+
+  // DELETE
+  const handleDeleteTask = (id) => {
+    setTasks((prevTasks) => prevTasks.filter(task => task.id !== id));
+  };
+
+  // UPDATE
+  const handleUpdateTask = (updatedTask) => {
+    setTasks((prevTasks) =>
+      prevTasks.map(task => (task.id === updatedTask.id ? updatedTask : task))
+    );
+    setEditingTask(null); // Clear editing state after update
+  };
+
+  // EDIT: Open modal with task data
+  const handleEditTask = (task) => {
+    setEditingTask(task);
+    formRef.current.openModal(task);
+  };
+
+  // When creating, open modal with no task
+  const handleOpenCreate = () => {
+    setEditingTask(null);
+    formRef.current.openModal();
+  };
+
+  return (
+    <div className="d-flex flex-column body" style={{ minHeight: '100vh' }}>
+      {/* Header */}
+      <Header onAddClick={handleOpenCreate} />
+
+      {/* Body: Sidebar + Content */}
+      <div className="d-flex flex-grow-1">
+        {/* Sidebar */}
+        <div className="col-md-2 p-3">
+          <Sidebar />
+        </div>
+
+        {/* Main Content */}
+        <div className="col-md-10 p-4">
+          <div className="row mb-3">
+            <div className="col">
+              <MainContent
+                tasks={tasks}
+                onDelete={handleDeleteTask}
+                onEdit={handleEditTask}
+              />
+            </div>
+          </div>
+          {/* JSON Display */}
+          {/* <div>
+            <h5>Tasks JSON:</h5>
+            <pre>{JSON.stringify(tasks, null, 2)}</pre>
+          </div> */}
+        </div>
+
+      </div>
+
+
+      {/* Footer */}
+      <Footer />
+
+      {/* Create Task Modal (mounted globally) */}
+      <CreateTaskForm
+        ref={formRef}
+        onSubmit={handleAddTask}
+        onUpdate={handleUpdateTask}
+        editingTask={editingTask}
+      />
+    </div>
+  );
+};
+
+export default App;
