@@ -9,7 +9,7 @@ const Sidebar = () => {
   const sidebarIcons = [faList, faSquareCheck, faTrash];
 
   return (
-    <div className="p-3" style={{ width: '250px', minHeight: '100vh' }}>
+    <div className="" style={{ width: 'auto', minHeight: '100vh' }}>
       <Profile />
       <h6 className="ps-2 text-muted mt-3">Menu</h6>
       <ul className="nav flex-column">

@@ -1,9 +1,9 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrash, faEllipsisH, faCheck } from '@fortawesome/free-solid-svg-icons';
 import styles from './TaskOptions.module.css';
-const TaskOptions = ({ onEdit, onDelete }) => {
+const TaskOptions = ({ onEdit, onDelete, onDone }) => {
   const [show, setShow] = useState(false);
   const boxRef = useRef(null);
 
@@ -26,6 +26,9 @@ const TaskOptions = ({ onEdit, onDelete }) => {
 
       {show && (
         <div className={`position-absolute bg-white border shadow-sm rounded ${styles.dropdownItemDiv} `}>
+          <div className={`dropdown-item d-flex ${styles.actionBtn}`} onClick={onDone} >
+            <FontAwesomeIcon icon={faCheck} className="me-2 mt-1" /> Done
+          </div>
           <div className={`dropdown-item d-flex ${styles.actionBtn}`} onClick={onEdit} >
             <FontAwesomeIcon icon={faEdit} className="me-2 mt-1" /> Edit
           </div>

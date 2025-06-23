@@ -1,4 +1,4 @@
-.todoList{
+.todoList {
   border: 2px solid #8d86bc;
   border-radius: 5px;
   margin: 10px;
@@ -6,6 +6,9 @@
   background-color: #fff;
 }
 
-.checkbox{
-  border: 0;
+.checkbox {
+  border: 1px solid #8d86bc;
+  border-radius: 5px;
+  padding: 5px;
+  background-color: #fff;
 }

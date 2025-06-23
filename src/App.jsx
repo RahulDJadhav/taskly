@@ -9,6 +9,7 @@ import './App.css';
 const App = () => {
   const [tasks, setTasks] = useState([]);
   const [editingTask, setEditingTask] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
   const formRef = useRef();
 
 
@@ -28,11 +29,15 @@ const App = () => {
   // CREATE
   const handleAddTask = (newTask) => {
     setTasks((prevTasks) => [...prevTasks, newTask]);
+    setSuccessMessage('Task Created Successfully!');
+    setTimeout(() => setSuccessMessage(''), 2000);
   };
 
   // DELETE
   const handleDeleteTask = (id) => {
     setTasks((prevTasks) => prevTasks.filter(task => task.id !== id));
+    setSuccessMessage('Task Deleted Successfully!');
+    setTimeout(() => setSuccessMessage(''), 2000);
   };
 
   // UPDATE
@@ -40,6 +45,8 @@ const App = () => {
     setTasks((prevTasks) =>
       prevTasks.map(task => (task.id === updatedTask.id ? updatedTask : task))
     );
+    setSuccessMessage('Task Updated Successfully!');
+    setTimeout(() => setSuccessMessage(''), 2000);
     setEditingTask(null); // Clear editing state after update
   };
 
@@ -53,6 +60,15 @@ const App = () => {
   const handleOpenCreate = () => {
     setEditingTask(null);
     formRef.current.openModal();
+  };
+
+  // Done
+  const handleDoneTask = (id) => {
+    setTasks((prevTasks) =>
+      prevTasks.map(task => (task.id === id ? { ...task, status: 'Done' } : task))
+    );
+    setSuccessMessage('Task Done Successfully!');
+    setTimeout(() => setSuccessMessage(''), 2000);
   };
 
   return (
@@ -71,10 +87,17 @@ const App = () => {
         <div className="col-md-10 p-4">
           <div className="row mb-3">
             <div className="col">
+              {successMessage && (
+                <div className="taskSuccess">
+                  {successMessage}
+                </div>
+
+              )}
               <MainContent
                 tasks={tasks}
                 onDelete={handleDeleteTask}
                 onEdit={handleEditTask}
+                onDone={handleDoneTask}
               />
             </div>
           </div>

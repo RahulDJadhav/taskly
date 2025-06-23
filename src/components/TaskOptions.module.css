@@ -1,4 +1,4 @@
-.actionBtn:hover{
+.actionBtn:hover {
   background-color: #e6e5fa !important;
   border-radius: 8px !important;
   color: #4d46e1 !important;
@@ -15,10 +15,11 @@
   color: #4d46e1;
   background-color: #fff;
   border-radius: 4px;
-  padding: 5px;  
+  padding: 5px;
 }
 
-.actionBtn{
+.actionBtn {
   width: 100%;
-  padding: 5px;
+  padding: 5px !important;
+  background-color: #fff !important;
 }

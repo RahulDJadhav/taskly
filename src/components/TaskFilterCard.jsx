@@ -8,12 +8,12 @@ const TaskFilterCard = () => {
 
   let taskItems = ["All", "My Task", "Favorites", "Done", "Deleted"];
   let taskItemCounts = [10, 5, 3, 8, 2];
-  
+
   // Use actual icons instead of string names
   const taskIcons = [faList, farStar, farHeart, faSquareCheck, faTrash];
 
   return (
-    <div className="card shadow-sm rounded-4 p-3 w-75 border-0">
+    <div className="card shadow-sm rounded-4 p-3 w-75 border-0 h-50">
       <ul className="list-group list-group-flush">
         {
           taskItems.map((task, index) => (

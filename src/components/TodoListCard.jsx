@@ -6,16 +6,8 @@ import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 import TaskOptions from './TaskOptions';
 import TaskTextToggle from './TaskTextToggle';
 
-const TodoListCard = ({ data, onEdit, onDelete }) => {
+const TodoListCard = ({ data, onEdit, onDelete, onDone }) => {
 
-  // const [tasks, setTasks] = useState(data);
-
-  // useEffect(() => {
-  //   const storedTasks = localStorage.getItem('todoTasks');
-  //   if (storedTasks) {
-  //     setTasks(JSON.parse(storedTasks));
-  //   }
-  // }, []);
 
   if (data.length === 0) {
     return <div className="row d-flex align-items-center">
@@ -24,16 +16,6 @@ const TodoListCard = ({ data, onEdit, onDelete }) => {
       </div>
     </div>;
   }
-
-  // const handleEdit = (task) => {
-  //   alert(`Edit Task: ${task.taskTitle}`);
-  //   // TODO: Pass task data to a modal for editing
-  // };
-
-  // const handleDelete = (taskId) => {
-  //   alert(`Delete Task ID: ${taskId}`);
-  //   // TODO: Pass taskId to parent for deletion
-  // };
 
   return (
     <div className="container">
@@ -61,6 +43,7 @@ const TodoListCard = ({ data, onEdit, onDelete }) => {
             <TaskOptions
               onEdit={() => onEdit && onEdit(task)}
               onDelete={() => onDelete && onDelete(task.id)}
+              onDone={() => onDone && onDone(task.id)}
             />
           </div>
         </div>
