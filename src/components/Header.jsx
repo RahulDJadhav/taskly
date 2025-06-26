@@ -17,13 +17,13 @@ const Header = ({ onAddClick, onLogout }) => {
 
         <form className="d-flex w-50 mx-3 col-md-4">
           <input className="form-control me-2" type="search" placeholder="Search tasks..." aria-label="Search" />
-          {/* <button className="btn btn-outline-dark" type="submit">Search</button> */}
         </form>
 
-        <div className='d-flex align-items-center'>
-          <FontAwesomeIcon icon={faBell} className="me-4" style={{ cursor: 'pointer' }} onClick={() => alert('Bell clicked!')} />
-          <AddButton label='Add Task' onClick={onAddClick} className='me-4' />
-          <FontAwesomeIcon icon={faSignOutAlt} className="me-4" style={{ cursor: 'pointer', marginLeft: '10px' }} title="Logout" onClick={onLogout} />
+        <div className='d-flex align-items-center justify-content-end'>
+          <AddButton label='Add Task' onClick={onAddClick} className="me-4" />
+          <FontAwesomeIcon icon={faBell} className="me-4" style={{ cursor: 'pointer', marginLeft: '10px' }} onClick={() => alert('Bell clicked!')} />
+
+          <FontAwesomeIcon icon={faSignOutAlt} className="me-2" style={{ cursor: 'pointer' }} title="Logout" onClick={onLogout} />
         </div>
 
       </div>

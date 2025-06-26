@@ -10,6 +10,7 @@ const Login = ({ onLogin }) => {
     // Simple validation (replace with real auth in production)
     if (email === 'admin@xts.com' && password === 'Admin') {
       setError('');
+      // If onLogin exists, call it. Otherwise, do nothing.
       onLogin && onLogin();
     } else {
       setError('Invalid email or password');
