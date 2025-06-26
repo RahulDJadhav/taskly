@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styles from './TodoListCard.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar as farStar } from '@fortawesome/free-regular-svg-icons';
-import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
+import { faStar as farStar, faHeart as farHeart } from '@fortawesome/free-regular-svg-icons';
+import { faEllipsisH, faSquare } from '@fortawesome/free-solid-svg-icons';
 import TaskOptions from './TaskOptions';
 import TaskTextToggle from './TaskTextToggle';
 
@@ -23,12 +23,14 @@ const TodoListCard = ({ data, onEdit, onDelete, onDone }) => {
         <div key={task.id} className={`row d-flex align-items-center mb-3 ${styles.todoList}`}>
           <div className="col-md-1">
             <div className="form-check d-flex align-items-center">
-              <input
+              {/* <input
                 className={`form-check-input me-2 ${styles.checkbox}`}
                 type="checkbox"
                 id={`check-${task.id}`}
-              />
+              /> */}
+              <FontAwesomeIcon icon={faSquare} className="me-2" />
               <FontAwesomeIcon icon={farStar} className="me-2" />
+              <FontAwesomeIcon icon={farHeart} className="me-2" />
             </div>
           </div>
           <div className="col-md-10 d-flex  justify-content-evenly">
