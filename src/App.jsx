@@ -22,7 +22,7 @@ const App = () => {
 
   // isLoggedIn: Tracks if the user is logged in.
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const [activeFilter, setActiveFilter] = useState('All');
 
   // useEffect: On first render, loads tasks from localStorage (if any) and sets them in state.
   useEffect(() => {
@@ -42,7 +42,7 @@ const App = () => {
 
   // CREATE
   const handleAddTask = (newTask) => {
-    setTasks((prevTasks) => [...prevTasks, newTask]);
+    setTasks((prevTasks) => [...prevTasks, { ...newTask, isFavorite: false }]);
     setSuccessMessage('Task Created Successfully!');
     setTimeout(() => setSuccessMessage(''), 1000);
   };
@@ -89,6 +89,40 @@ const App = () => {
     setIsLoggedIn(false);
   };
 
+  const handleFilterChange = (filter) => {
+    setActiveFilter(filter);
+    // Optional: clear success message when filter changes
+    setSuccessMessage('');
+  };
+
+  // Toggle Favorite status
+  const handleToggleFavorite = (id) => {
+    setTasks((prevTasks) =>
+      prevTasks.map(task =>
+        task.id === id ? { ...task, isFavorite: !task.isFavorite } : task
+      )
+    );
+    setSuccessMessage('Task favorite status updated!');
+    setTimeout(() => setSuccessMessage(''), 1000);
+  };
+
+
+
+  // Calculate dynamic counts for TaskFilterCard
+  const allTasksCount = tasks.length;
+  const myTasksCount = tasks.filter(task => task.assignee === 'Rahul Jadhav' && task.status !== 'Done').length; // Assuming 'Rahul Jadhav' is your assignee. Adjust if needed. Also, assuming 'My Task' means not yet done.
+  const favoritesCount = tasks.filter(task => task.isFavorite).length;
+  const doneTasksCount = tasks.filter(task => task.status === 'Done').length;
+  const deletedTasksCount = 0; // You don't have a 'deleted' status yet, so it's 0. Tasks are currently permanently removed.
+
+  const taskCounts = {
+    "All": allTasksCount,
+    "My Task": myTasksCount,
+    "Favorites": favoritesCount,
+    "Done": doneTasksCount,
+    "Deleted": deletedTasksCount,
+  };
+
 
   // Purpose: If the user is not logged in, show the login page.
   // After login: The main app is rendered.
@@ -122,6 +156,10 @@ const App = () => {
                 onDelete={handleDeleteTask}
                 onEdit={handleEditTask}
                 onDone={handleDoneTask}
+                onToggleFavorite={handleToggleFavorite}
+                activeFilter={activeFilter}
+                onFilterChange={handleFilterChange}
+                taskCounts={taskCounts}
               />
             </div>
           </div>

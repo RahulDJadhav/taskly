@@ -6,7 +6,7 @@ import { faEllipsisH, faSquare } from '@fortawesome/free-solid-svg-icons';
 import TaskOptions from './TaskOptions';
 import TaskTextToggle from './TaskTextToggle';
 
-const TodoListCard = ({ data, onEdit, onDelete, onDone }) => {
+const TodoListCard = ({ data, onEdit, onDelete, onDone, onToggleFavorite }) => {
 
 
   if (data.length === 0) {
@@ -28,9 +28,21 @@ const TodoListCard = ({ data, onEdit, onDelete, onDone }) => {
                 type="checkbox"
                 id={`check-${task.id}`}
               /> */}
-              <FontAwesomeIcon icon={faSquare} className="me-2" />
+              <input
+                className={`form-check-input me-2 ${styles.checkbox}`}
+                type="checkbox"
+                id={`check-${task.id}`}
+                checked={task.status === 'Done'} // Check if task is 'Done'
+                onChange={() => onDone && onDone(task.id)} // Call onDone when checkbox is clicked
+              />
               <FontAwesomeIcon icon={farStar} className="me-2" />
-              <FontAwesomeIcon icon={farHeart} className="me-2" />
+              {/* 3. Make the Heart icon toggle Favorite status */}
+              <FontAwesomeIcon
+                icon={task.isFavorite ? farHeart : farHeart} // Use solid heart if favorite, outlined if not
+                className="me-2"
+                style={{ cursor: 'pointer', color: task.isFavorite ? '#ff69b4' : '#6c757d' }} // Pink for favorited, grey for not
+                onClick={() => onToggleFavorite && onToggleFavorite(task.id)} // Call handler on click
+              />
             </div>
           </div>
           <div className="col-md-10 d-flex  justify-content-evenly">

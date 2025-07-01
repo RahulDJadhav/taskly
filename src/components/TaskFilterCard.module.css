@@ -5,6 +5,7 @@
   margin: 5px;
   text-decoration: none;
 }
+
 .taskItem:hover {
   background-color: #e6e5fa;
   color: #4d46e1;
@@ -12,7 +13,14 @@
   border: 5px;
 }
 
-.taskBadge{
+.taskBadge {
   background-color: #4d46e1;
   color: white;
+}
+
+/* Add this new style for the active filter item */
+.activeFilter {
+  background-color: #4d46e1 !important;
+  /* Your primary color */
+  color: white !important;
 }
