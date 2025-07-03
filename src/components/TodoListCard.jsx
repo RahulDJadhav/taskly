@@ -49,7 +49,15 @@ const TodoListCard = ({ data, onEdit, onDelete, onDone, onToggleFavorite }) => {
             <span className={`fw-semibold `}>{task.title}</span>
             {/* <span className={`text-muted small me-3 `}>{task.dueDate}</span>  // Comment this line bcz I dont want to show due date */}
             <span className={`text-muted small me-3 `}><TaskTextToggle text={task.description} maxLength={20} /></span>
-            <span className={`badge bg-secondary `}>{task.priority}</span>
+            <span 
+                className={`badge 
+                ${task.priority === 'Urgent' ? 'bg-danger' 
+                 : task.priority === 'High' ? 'bg-warning' 
+                 : task.priority === 'Medium' ? 'bg-success' 
+                 : 'bg-secondary' 
+                } `}
+                 >{task.priority}
+            </span>
             <span className={`text-muted small `}>{task.status}</span>
             <span className={`text-muted small `}>{task.assignee}</span>
           </div>
@@ -65,5 +73,4 @@ const TodoListCard = ({ data, onEdit, onDelete, onDone, onToggleFavorite }) => {
     </div>
   );
 };
-
 export default TodoListCard;
