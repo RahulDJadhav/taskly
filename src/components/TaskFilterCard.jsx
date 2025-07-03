@@ -1,19 +1,19 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart as farHeart, faStar as farStar } from '@fortawesome/free-regular-svg-icons';
-import { faList, faTrash, faSquareCheck } from '@fortawesome/free-solid-svg-icons';
+import { faList, faClock, faSquareCheck } from '@fortawesome/free-solid-svg-icons';
 import styles from './TaskFilterCard.module.css';
 
 const TaskFilterCard = ({ activeFilter, onFilterChange, taskCounts }) => {
 
-  let taskItems = ["All", "My Task", "Favorites", "Done", "Deleted"];
+  let taskItems = ["All", "My Task", "Favorites", "Done", "Due Soon"];
   // let taskItemCounts = [10, 5, 3, 8, 2];
 
   // Use actual icons instead of string names
-  const taskIcons = [faList, farStar, farHeart, faSquareCheck, faTrash];
+  const taskIcons = [faList, farStar, farHeart, faSquareCheck, faClock];
 
   return (
-    <div className="card shadow-sm rounded-4 p-3 w-75 border-0 h-50">
+    <div className="card shadow-sm rounded-4 p-3 w-75 border-0">
       <ul className="list-group list-group-flush">
         {
           taskItems.map((item, index) => ( // Changed 'task' to 'item' to avoid confusion with task object

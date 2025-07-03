@@ -79,7 +79,15 @@ const App = () => {
   // Done
   const handleDoneTask = (id) => {
     setTasks((prevTasks) =>
-      prevTasks.map(task => (task.id === id ? { ...task, status: 'Done' } : task))
+      prevTasks.map(task => {
+        if (task.id === id) {
+          // Toggle the status: if 'Done', set to 'Open', otherwise set to 'Done'
+          const newStatus = task.status === 'Done' ? 'Open' : 'Done';
+          setSuccessMessage(`Task marked as ${newStatus} Successfully!`); // Update success message
+          return { ...task, status: newStatus };
+        }
+        return task;
+      })
     );
     setSuccessMessage('Task Done Successfully!');
     setTimeout(() => setSuccessMessage(''), 1000);
@@ -113,14 +121,31 @@ const App = () => {
   const myTasksCount = tasks.filter(task => task.assignee === 'Rahul Jadhav' && task.status !== 'Done').length; // Assuming 'Rahul Jadhav' is your assignee. Adjust if needed. Also, assuming 'My Task' means not yet done.
   const favoritesCount = tasks.filter(task => task.isFavorite).length;
   const doneTasksCount = tasks.filter(task => task.status === 'Done').length;
-  const deletedTasksCount = 0; // You don't have a 'deleted' status yet, so it's 0. Tasks are currently permanently removed.
+
+  // Calculate Due Soon tasks
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Normalize to start of day
+
+  const sevenDaysFromNow = new Date();
+  sevenDaysFromNow.setDate(today.getDate() + 7);
+  sevenDaysFromNow.setHours(23, 59, 59, 999); // Normalize to end of day 7 days from now
+
+  const dueSoonTasksCount = tasks.filter(task => {
+    if (!task.dueDate) return false; // Task has no due date, so it's not due soon
+
+    const taskDueDate = new Date(task.dueDate); // Convert task's due date string to Date object
+    taskDueDate.setHours(0, 0, 0, 0); // Normalize to start of day
+
+    // Check if the task's due date is today or in the future, and within 7 days from today, and not already done
+    return taskDueDate >= today && taskDueDate <= sevenDaysFromNow && task.status !== 'Done';
+  }).length;
 
   const taskCounts = {
     "All": allTasksCount,
     "My Task": myTasksCount,
     "Favorites": favoritesCount,
     "Done": doneTasksCount,
-    "Deleted": deletedTasksCount,
+    "Due Soon": dueSoonTasksCount,
   };
 
 
