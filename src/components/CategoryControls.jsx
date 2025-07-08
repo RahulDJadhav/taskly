@@ -1,7 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faList, faCaretDown  } from '@fortawesome/free-solid-svg-icons';
+import {useState} from 'react';
 
 const CategoryControls = () => {
+  
   const handleClick = () => {
     alert("Dropdown Clicked!");
   }

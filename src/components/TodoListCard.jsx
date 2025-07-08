@@ -20,7 +20,11 @@ const TodoListCard = ({ data, onEdit, onDelete, onDone, onToggleFavorite }) => {
   return (
     <div className="container">
       {data.map(task => (
-        <div key={task.id} className={`row d-flex align-items-center mb-3 ${styles.todoList}`}>
+        <div key={task.id} className={`row d-flex align-items-center mb-3 ${styles.todoList}  ${task.priority === 'Urgent' ? 'border border-danger border-2' 
+        : task.priority === 'High' ? 'border border-warning border-2' 
+        : task.priority === 'Medium' ? 'border border-success border-2' 
+        : 'border border-secondary border-2' 
+       }`}>
           <div className="col-md-1">
             <div className="form-check d-flex align-items-center">
               {/* <input
