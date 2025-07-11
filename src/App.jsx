@@ -32,6 +32,7 @@ const App = () => {
       setTasks(JSON.parse(storedTasks));
     }
   }, []);
+  // it will run only on first render
 
 
   // useEffect: Every time tasks changes, saves the updated tasks array to localStorage.
@@ -39,6 +40,8 @@ const App = () => {
     localStorage.setItem('todoTasks', JSON.stringify(tasks));
     console.log('Saved to storage:', tasks);
   }, [tasks]);
+// it will run every time tasks changes
+
 
   // CREATE
   const handleAddTask = (newTask) => {

@@ -12,3 +12,10 @@
   padding: 5px;
   background-color: #fff;
 }
+
+.fixedWidth {
+  width: auto; /* Adjust the width as needed */
+  overflow: hidden; /* Prevent content overflow */
+  text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+  white-space: nowrap; /* Prevent text wrapping */
+}

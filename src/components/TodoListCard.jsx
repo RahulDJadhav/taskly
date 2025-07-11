@@ -49,10 +49,10 @@ const TodoListCard = ({ data, onEdit, onDelete, onDone, onToggleFavorite }) => {
               />
             </div>
           </div>
-          <div className="col-md-10 d-flex  justify-content-evenly">
-            <span className={`fw-semibold `}>{task.title}</span>
+          <div className="col-md-10 d-flex  justify-content-between align-items-center">
+            <span className={`fw-semibold ${styles.fixedWidth}`}><TaskTextToggle text={task.title} maxLength={15} /></span>
             {/* <span className={`text-muted small me-3 `}>{task.dueDate}</span>  // Comment this line bcz I dont want to show due date */}
-            <span className={`text-muted small me-3 `}><TaskTextToggle text={task.description} maxLength={20} /></span>
+            <span className={`text-muted small  ${styles.fixedWidth}`}><TaskTextToggle text={task.description} maxLength={20} /></span>
             <span 
                 className={`badge 
                 ${task.priority === 'Urgent' ? 'bg-danger' 
