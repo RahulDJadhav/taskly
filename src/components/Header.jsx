@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faBell, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faBell, faSignOutAlt,faTasks } from '@fortawesome/free-solid-svg-icons';
 import AddButton from './AddButton';
 import CreateTaskForm from './CreateTaskForm';
 
@@ -12,7 +12,7 @@ const Header = ({ onAddClick, onLogout }) => {
       <div className="container-fluid d-flex justify-content-between align-items-center">
 
 
-        <span className="navbar-brand mb-0 h1 text-dark">TASK FLOW</span>
+        <span className="navbar-brand mb-0 h1" style={{color: '#4d46e1'}}><FontAwesomeIcon icon={faTasks} size="1x"  /> Taskly</span>
 
 
         <form className="d-flex w-50 mx-3 col-md-4">
