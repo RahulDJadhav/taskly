@@ -82,8 +82,6 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, editingTask }, ref) => 
 
   return (
     <>
-      {/* <AddButton label="Add Task" onClick={() => ref.current?.openModal()} /> */}
-
       <div className="modal fade" ref={modalRef} tabIndex="-1" aria-hidden="true">
         <div className="modal-dialog modal-lg modal-dialog-centered">
           <div className="modal-content border-0 shadow-lg">
@@ -157,7 +155,6 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, editingTask }, ref) => 
                         <option value="">Select</option>
                         <option>Open</option>
                         <option>In Progress</option>
-                        <option>Completed</option>
                         <option>On Hold</option>
                       </select>
                     </div>

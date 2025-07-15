@@ -9,6 +9,8 @@ import Login from './components/Login';
 
 
 const App = () => {
+
+  const API_BASE = 'http://localhost/taskly/taskly/backend/';
   // tasks: Array holding all todo tasks
   const [tasks, setTasks] = useState([]);
 
@@ -26,13 +28,13 @@ const App = () => {
   const [activeFilter, setActiveFilter] = useState('All');
 
   // useEffect: On first render, loads tasks from localStorage (if any) and sets them in state.
-  useEffect(() => {
-    const storedTasks = localStorage.getItem('todoTasks');
-    console.log('Loaded from storage:', storedTasks);
-    if (storedTasks) {
-      setTasks(JSON.parse(storedTasks));
-    }
-  }, []);
+  // useEffect(() => {
+  //   const storedTasks = localStorage.getItem('todoTasks');
+  //   console.log('Loaded from storage:', storedTasks);
+  //   if (storedTasks) {
+  //     setTasks(JSON.parse(storedTasks));
+  //   }
+  // }, []);
   // it will run only on first render
 
 
@@ -42,7 +44,7 @@ const App = () => {
   //   console.log('Saved to storage:', tasks);
   // }, [tasks]);
   useEffect(() => {
-    fetch('http://localhost/taskly/taskly/backend/getTasks.php')
+    fetch(`${API_BASE}getTasks.php`)
       .then(response => response.json())
       .then(data => setTasks(data));
   }, [tasks]);
@@ -58,7 +60,7 @@ const App = () => {
 
   const handleAddTask = (newTask) => {
     const taskWithFavorite = { ...newTask, isFavorite: false }; // Default to false
-    fetch('http://localhost/taskly/taskly/backend/addTask.php', {
+    fetch(`${API_BASE}addTasks.php`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -69,7 +71,7 @@ const App = () => {
       if (!response.ok) {
         throw new Error('Failed to add task');
       }
-      return fetch('http://localhost/taskly/taskly/backend/getTasks.php');
+      return fetch(`${API_BASE}getTasks.php`);
     })
     .then(response => {
       if (!response.ok) {
@@ -100,7 +102,7 @@ const App = () => {
   // UPDATE
   const handleUpdateTask = async (updatedTask) => {
     try {
-      const res = await fetch('http://localhost/taskly/taskly/backend/updateTask.php', {
+      const res = await fetch(`${API_BASE}updateTasks.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -116,7 +118,7 @@ const App = () => {
       }
   
       // Refresh task list
-      const taskRes = await fetch('http://localhost/taskly/taskly/backend/getTasks.php');
+      const taskRes = await fetch(`${API_BASE}getTasks.php`);
       const data = await taskRes.json();
       setTasks(data);
   
@@ -132,7 +134,7 @@ const App = () => {
     if (!confirmDelete) return;
   
     try {
-      const res = await fetch('http://localhost/taskly/taskly/backend/deleteTask.php', {
+      const res = await fetch(`${API_BASE}deleteTasks.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -144,7 +146,7 @@ const App = () => {
   
       if (result.message === "Task deleted successfully.") {
         // Refresh the task list
-        const taskRes = await fetch('http://localhost/taskly/taskly/backend/getTasks.php');
+        const taskRes = await fetch(`${API_BASE}getTasks.php`);
         const data = await taskRes.json();
         setTasks(data);
       } else {
@@ -170,22 +172,49 @@ const App = () => {
   };
 
   // Done
-  const handleDoneTask = (id) => {
-    setTasks((prevTasks) =>
-      prevTasks.map(task => {
-        if (task.id === id) {
-          // Toggle the status: if 'Done', set to 'Open', otherwise set to 'Done'
-          const newStatus = task.status === 'Done' ? 'Open' : 'Done';
-          setSuccessMessage(`Task marked as ${newStatus} Successfully!`); // Update success message
-          return { ...task, status: newStatus };
-        }
-        return task;
-      })
-    );
-    setSuccessMessage('Task Done Successfully!');
-    setTimeout(() => setSuccessMessage(''), 1000);
+  // const handleDoneTask = (id) => {
+  //   setTasks((prevTasks) =>
+  //     prevTasks.map(task => {
+  //       if (task.id === id) {
+  //         // Toggle the status: if 'Done', set to 'Open', otherwise set to 'Done'
+  //         const newStatus = task.status === 'Done' ? 'Open' : 'Done';
+  //         setSuccessMessage(`Task marked as ${newStatus} Successfully!`); // Update success message
+  //         return { ...task, status: newStatus };
+  //       }
+  //       return task;
+  //     })
+  //   );
+  //   setSuccessMessage('Task Done Successfully!');
+  //   setTimeout(() => setSuccessMessage(''), 1000);
+  // };
+  const handleDoneTask = async (id) => {
+    const task = tasks.find(t => t.id === id);
+    const newStatus = task.status === 'Done' ? 'Open' : 'Done';
+  
+    try {
+      const res = await fetch(`${API_BASE}updateStatus.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: newStatus })
+      });
+  
+      const result = await res.json();
+  
+      if (result.message === 'Status updated') {
+        const taskRes = await fetch(`${API_BASE}getTasks.php`);
+        const data = await taskRes.json();
+        setTasks(data);
+        setSuccessMessage(`Task marked as ${newStatus} successfully!`);
+        setTimeout(() => setSuccessMessage(''), 1000);
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update task status');
+    }
   };
-
+  
   const handleLogout = () => {
     setIsLoggedIn(false);
   };
@@ -206,34 +235,33 @@ const App = () => {
   //   setSuccessMessage('Task favorite status updated!');
   //   setTimeout(() => setSuccessMessage(''), 1000);
   // };
-  const handleToggleFavorite = (taskId, isFavorite) => {
-    fetch('http://localhost/taskly/taskly/backend/toggleFavorite.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id: taskId, isFavorite }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to update favorite status');
-        }
-        return fetch('http://localhost/taskly/taskly/backend/getTasks.php');
-      })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to fetch tasks');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setTasks(data);
-      })
-      .catch((error) => {
-        console.error('Error updating favorite status:', error);
-        alert('Something went wrong while updating the favorite status.');
+  const handleToggleFavorite = async (id, isCurrentlyFavorite) => {
+    const newFavoriteStatus = !isCurrentlyFavorite;
+  
+    try {
+      const res = await fetch(`${API_BASE}toggleFavorite.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, isFavorite: newFavoriteStatus })
       });
+  
+      const result = await res.json();
+  
+      if (result.message === 'Favorite status updated') {
+        const taskRes = await fetch(`${API_BASE}getTasks.php`);
+        const data = await taskRes.json();
+        setTasks(data);
+        setSuccessMessage('Task favorite status updated!');
+        setTimeout(() => setSuccessMessage(''), 1000);
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update favorite status');
+    }
   };
+  
 
 
   // Calculate dynamic counts for TaskFilterCard

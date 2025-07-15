@@ -3,6 +3,8 @@ import styles from './TodoListCard.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as farStar, faHeart as farHeart } from '@fortawesome/free-regular-svg-icons';
 import { faEllipsisH, faSquare } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons'; // filled
+import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons'; // outlined
 import TaskOptions from './TaskOptions';
 import TaskTextToggle from './TaskTextToggle';
 
@@ -42,10 +44,10 @@ const TodoListCard = ({ data, onEdit, onDelete, onDone, onToggleFavorite }) => {
               <FontAwesomeIcon icon={farStar} className="me-2" />
               {/* 3. Make the Heart icon toggle Favorite status */}
               <FontAwesomeIcon
-  icon={task.isFavorite ? farHeart : farHeart} // Use solid heart if favorite, outlined if not
+  icon={task.isFavorite ? solidHeart : regularHeart}
   className="me-2"
-  style={{ cursor: 'pointer', color: task.isFavorite ? '#ff69b4' : '#6c757d' }} // Pink for favorited, grey for not
-  onClick={() => onToggleFavorite && onToggleFavorite(task.id, !task.isFavorite)} // Call handler on click
+  style={{ cursor: 'pointer', color: task.isFavorite ? '#ff69b4' : '#6c757d' }}
+  onClick={() => onToggleFavorite && onToggleFavorite(task.id, task.isFavorite)}
 />
             </div>
           </div>
