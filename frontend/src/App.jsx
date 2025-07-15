@@ -42,7 +42,7 @@ const App = () => {
   //   console.log('Saved to storage:', tasks);
   // }, [tasks]);
   useEffect(() => {
-    fetch('http://localhost/todo-api/getTasks.php')
+    fetch('http://localhost/taskly/taskly/backend/getTasks.php')
       .then(response => response.json())
       .then(data => setTasks(data));
   }, [tasks]);
@@ -58,7 +58,7 @@ const App = () => {
 
   const handleAddTask = (newTask) => {
     const taskWithFavorite = { ...newTask, isFavorite: false }; // Default to false
-    fetch('http://localhost/todo-api/addTask.php', {
+    fetch('http://localhost/taskly/taskly/backend/addTask.php', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -69,7 +69,7 @@ const App = () => {
       if (!response.ok) {
         throw new Error('Failed to add task');
       }
-      return fetch('http://localhost/todo-api/getTasks.php');
+      return fetch('http://localhost/taskly/taskly/backend/getTasks.php');
     })
     .then(response => {
       if (!response.ok) {
@@ -100,7 +100,7 @@ const App = () => {
   // UPDATE
   const handleUpdateTask = async (updatedTask) => {
     try {
-      const res = await fetch('http://localhost/todo-api/updateTask.php', {
+      const res = await fetch('http://localhost/taskly/taskly/backend/updateTask.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -116,7 +116,7 @@ const App = () => {
       }
   
       // Refresh task list
-      const taskRes = await fetch('http://localhost/todo-api/getTasks.php');
+      const taskRes = await fetch('http://localhost/taskly/taskly/backend/getTasks.php');
       const data = await taskRes.json();
       setTasks(data);
   
@@ -132,7 +132,7 @@ const App = () => {
     if (!confirmDelete) return;
   
     try {
-      const res = await fetch('http://localhost/todo-api/deleteTask.php', {
+      const res = await fetch('http://localhost/taskly/taskly/backend/deleteTask.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -144,7 +144,7 @@ const App = () => {
   
       if (result.message === "Task deleted successfully.") {
         // Refresh the task list
-        const taskRes = await fetch('http://localhost/todo-api/getTasks.php');
+        const taskRes = await fetch('http://localhost/taskly/taskly/backend/getTasks.php');
         const data = await taskRes.json();
         setTasks(data);
       } else {
@@ -207,7 +207,7 @@ const App = () => {
   //   setTimeout(() => setSuccessMessage(''), 1000);
   // };
   const handleToggleFavorite = (taskId, isFavorite) => {
-    fetch('http://localhost/todo-api/toggleFavorite.php', {
+    fetch('http://localhost/taskly/taskly/backend/toggleFavorite.php', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -218,7 +218,7 @@ const App = () => {
         if (!response.ok) {
           throw new Error('Failed to update favorite status');
         }
-        return fetch('http://localhost/todo-api/getTasks.php');
+        return fetch('http://localhost/taskly/taskly/backend/getTasks.php');
       })
       .then((response) => {
         if (!response.ok) {
