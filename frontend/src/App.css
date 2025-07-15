@@ -1,0 +1,22 @@
+.body {
+  background-color: #f6f4ff;
+}
+
+.taskSuccess {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  background: #d4edda;
+  color: #155724;
+  padding: 24px 40px;
+  border-Radius: 8px;
+  box-Shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  z-Index: 9999;
+  font-Size: 1.2rem;
+  font-Weight: bold;
+}
