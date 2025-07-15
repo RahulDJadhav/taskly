@@ -1,9 +1,8 @@
 <?php
 // Enable CORS
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET");
 header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: POST");
-
 // Connect to DB
 $conn = new mysqli("localhost", "root", "", "taskly"); // Change DB name if needed
 
