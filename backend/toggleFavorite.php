@@ -1,19 +1,15 @@
 <?php
-include 'db_connection.php';
+include 'db.php';
 
-$data = json_decode(file_get_contents('php://input'), true);
+$data = json_decode(file_get_contents("php://input"));
+$id = intval($data->id);
+$isFavorite = $data->isFavorite ? 1 : 0;
 
-$taskId = $data['id'];
-$isFavorite = $data['isFavorite'];
+$query = "UPDATE tasks SET isFavorite = $isFavorite WHERE id = $id";
 
-$sql = "UPDATE tasks SET isFavorite = $isFavorite WHERE id = $taskId";
-
-if ($conn->query($sql) === TRUE) {
-    echo json_encode(["message" => "Task updated successfully"]);
+if (mysqli_query($conn, $query)) {
+  echo json_encode(["message" => "Favorite status updated"]);
 } else {
-    http_response_code(500);
-    echo json_encode(["error" => "Error: " . $sql . "<br>" . $conn->error]);
+  echo json_encode(["message" => "Error updating favorite status"]);
 }
-
-$conn->close();
 ?>
