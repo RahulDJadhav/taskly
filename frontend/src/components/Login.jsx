@@ -3,19 +3,54 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTasks } from '@fortawesome/free-solid-svg-icons';
 
 const Login = ({ onLogin }) => {
+  // const API_BASE = 'http://localhost/taskly/taskly/backend/';
+  const API_BASE = 'http://localhost/taskly/taskly/backend/';
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (email === 'admin@xts.com' && password === 'Admin') {
-      setError('');
-      onLogin && onLogin();
-    } else {
-      setError('Invalid email or password');
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   if (email === 'admin@xts.com' && password === 'Admin') {
+  //     setError('');
+  //     onLogin && onLogin();
+  //   } else {
+  //     setError('Invalid email or password');
+  //   }
+  // };
+
+  const handleLogin = (e) => {
+    e.preventDefault(); // Prevent default form submission
+  
+    if (!email || !password) {
+      setError('Please enter both email and password');
+      return;
     }
+  
+    fetch(`${API_BASE}loginUser.php`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          console.log('Login Success:', data.user);
+          onLogin();
+        } else {
+          setError(data.message || 'Login failed');
+        }
+      })
+      .catch(err => {
+        console.error('Login error:', err);
+        setError('Something went wrong.');
+      });
   };
+  
+  
 
   return (
     <div className="d-flex vh-100">
@@ -41,7 +76,7 @@ const Login = ({ onLogin }) => {
             <p className="text-muted">Enter your credentials to access Taskly</p>
           </div>
           {error && <div className="alert alert-danger text-center">{error}</div>}
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleLogin}>
             <div className="mb-3">
               <label className="form-label text-muted">Email address</label>
               <input
@@ -63,7 +98,7 @@ const Login = ({ onLogin }) => {
                 required
               />
             </div>
-            <button type="submit" className="btn w-100 py-2 fw-bold text-white" style={{ backgroundColor: '#4d46e1', border: 'none', borderRadius: '8px' }}>
+            <button type="submit" onClick={handleLogin} className="btn w-100 py-2 fw-bold text-white" style={{ backgroundColor: '#4d46e1', border: 'none', borderRadius: '8px' }}>
               Login
             </button>
             <div className="text-center mt-3">
