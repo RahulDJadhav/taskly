@@ -1,0 +1,5 @@
+stdClass Object
+(
+    [id] => 5
+    [isFavorite] => 1
+)
