@@ -12,7 +12,7 @@ const MainContent = ({ tasks, onDelete, onEdit, onDone, onToggleFavorite, active
       return true; // Show all tasks
     }
     if (activeFilter === 'Done') {
-      return task.status === 'Done'; // Show only tasks with status 'Done'
+      return task.status === 'Done';
     }
     if (activeFilter === 'My Task') {
       // Assuming 'My Task' means tasks assigned to 'Rahul Jadhav' AND not yet 'Done'
@@ -49,7 +49,7 @@ const MainContent = ({ tasks, onDelete, onEdit, onDone, onToggleFavorite, active
           data={filteredTasks} // Pass the FILTERED tasks to TodoListCard
           onEdit={onEdit}
           onDelete={onDelete}
-          onDone={onDone}
+          // onDone={onDone}
           onToggleFavorite={onToggleFavorite} // Pass this down to TodoListCard
         />
       </div>
@@ -61,7 +61,7 @@ const MainContent = ({ tasks, onDelete, onEdit, onDone, onToggleFavorite, active
           onFilterChange={onFilterChange} // <-- Pass onFilterChange to TaskFilterCard
           taskCounts={taskCounts}         // <-- Pass taskCounts to TaskFilterCard
         />
-        
+
       </div>
     </div>
   );
