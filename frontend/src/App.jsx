@@ -38,15 +38,17 @@ const App = () => {
   };
 
   const handleAddTask = (newTask) => {
-    const taskWithFavorite = {
+    const taskWithDefaults = {
       ...newTask,
-      isFavorite: false, // optional: handled by DB default
+      is_important: false,
+      is_favorite: false,
+      is_done: false,
     };
 
     fetch(`${API_BASE}addTask.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(taskWithFavorite)
+      body: JSON.stringify(taskWithDefaults)
     })
       .then(response => response.json()) // Parse response as JSON
       .then(data => {
@@ -162,38 +164,58 @@ const App = () => {
   //   setSuccessMessage('Task Done Successfully!');
   //   setTimeout(() => setSuccessMessage(''), 1000);
   // };
-  const handleDoneTask = async (id) => {
-    const task = tasks.find(t => t.id === id);
-    const newStatus = task.status === 'Done' ? 'Open' : 'Done';
-
+  const handleDoneTask = async (id, isCurrentlyDone) => {
+    const newDoneStatus = (Number(isCurrentlyDone) === 1) ? 0 : 1;
+    // const newDoneStatus = isCurrentlyDone == "0" ? 1 : 0; // Previous attempt
     try {
       const res = await fetch(`${API_BASE}updateStatus.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, status: newStatus })
+        body: JSON.stringify({ id, is_done: newDoneStatus })
       });
-
       const result = await res.json();
-
-      if (result.message === 'Status updated') {
+      if (result.message === 'Done status updated') {
         const taskRes = await fetch(`${API_BASE}getTasks.php`);
         const data = await taskRes.json();
         setTasks(data);
-        setSuccessMessage(`Task marked as ${newStatus} successfully!`);
+        // setSuccessMessage(`Task marked as ${newDoneStatus ? 'Done' : 'Open'} successfully!`);
+        setSuccessMessage(
+          (Number(isCurrentlyDone) === 1)
+            ? "Task marked as Open successfully!"
+            : "Task marked as Done successfully!"
+        );
         setTimeout(() => setSuccessMessage(''), 1000);
       } else {
         throw new Error(result.message);
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to update task status');
+      alert('Failed to update task done status');
     }
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
   };
-
+  const handleToggleImportant = async (id, isCurrentlyImportant) => {
+    const newImportantStatus = isCurrentlyImportant ? 0 : 1;
+    try {
+      const res = await fetch(`${API_BASE}toggleImportant.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, is_important: newImportantStatus })
+      });
+      const result = await res.json();
+      if (res.ok && result.message === 'Important status updated') {
+        // Re-fetch tasks to update UI
+        const taskRes = await fetch(`${API_BASE}getTasks.php`);
+        const data = await taskRes.json();
+        setTasks(data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
     // Optional: clear success message when filter changes
@@ -211,30 +233,22 @@ const App = () => {
   //   setTimeout(() => setSuccessMessage(''), 1000);
   // };
   const handleToggleFavorite = async (id, isCurrentlyFavorite) => {
-    const newFavoriteStatus = isCurrentlyFavorite ? 0 : 1; // send as number
-
+    const newFavoriteStatus = isCurrentlyFavorite ? 0 : 1;
     try {
       const res = await fetch(`${API_BASE}toggleFavorite.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, isFavorite: newFavoriteStatus }) // send number
+        body: JSON.stringify({ id, is_favorite: newFavoriteStatus })
       });
-
       const result = await res.json();
-
       if (res.ok && result.message === 'Favorite status updated') {
+        // Re-fetch tasks to update UI
         const taskRes = await fetch(`${API_BASE}getTasks.php`);
         const data = await taskRes.json();
         setTasks(data);
-        console.log("Updated tasks:", data);
-        setSuccessMessage('Task favorite status updated!');
-        setTimeout(() => setSuccessMessage(''), 1000);
-      } else {
-        throw new Error(result.message);
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to update favorite status');
     }
   };
 
@@ -245,31 +259,24 @@ const App = () => {
 
   // Calculate dynamic counts for TaskFilterCard
   const allTasksCount = tasks.length;
-  const myTasksCount = tasks.filter(task => task.assignee === 'Rahul Jadhav' && task.status !== 'Done').length; // Assuming 'Rahul Jadhav' is your assignee. Adjust if needed. Also, assuming 'My Task' means not yet done.
-  const favoritesCount = tasks.filter(task => task.isFavorite).length;
-  const doneTasksCount = tasks.filter(task => task.status === 'Done').length;
-
-  // Calculate Due Soon tasks
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // Normalize to start of day
-
-  const sevenDaysFromNow = new Date();
-  sevenDaysFromNow.setDate(today.getDate() + 7);
-  sevenDaysFromNow.setHours(23, 59, 59, 999); // Normalize to end of day 7 days from now
-
+  const importantTasksCount = tasks.filter(task => task.is_important).length;
+  const favoritesCount = tasks.filter(task => task.is_favorite).length;
+  const doneTasksCount = tasks.filter(task => task.is_done).length;
   const dueSoonTasksCount = tasks.filter(task => {
-    if (!task.dueDate) return false; // Task has no due date, so it's not due soon
-
-    const taskDueDate = new Date(task.dueDate); // Convert task's due date string to Date object
-    taskDueDate.setHours(0, 0, 0, 0); // Normalize to start of day
-
-    // Check if the task's due date is today or in the future, and within 7 days from today, and not already done
-    return taskDueDate >= today && taskDueDate <= sevenDaysFromNow && task.status !== 'Done';
+    if (!task.due_date || task.is_done) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const sevenDaysFromNow = new Date();
+    sevenDaysFromNow.setDate(today.getDate() + 7);
+    sevenDaysFromNow.setHours(23, 59, 59, 999);
+    const taskDueDate = new Date(task.due_date);
+    taskDueDate.setHours(0, 0, 0, 0);
+    return taskDueDate >= today && taskDueDate <= sevenDaysFromNow;
   }).length;
 
   const taskCounts = {
     "All": allTasksCount,
-    "My Task": myTasksCount,
+    "Important": importantTasksCount,
     "Favorites": favoritesCount,
     "Done": doneTasksCount,
     "Due Soon": dueSoonTasksCount,
@@ -309,6 +316,7 @@ const App = () => {
                 onEdit={handleEditTask}
                 onDone={handleDoneTask}
                 onToggleFavorite={handleToggleFavorite}
+                onToggleImportant={handleToggleImportant}
                 activeFilter={activeFilter}
                 onFilterChange={handleFilterChange}
                 taskCounts={taskCounts}

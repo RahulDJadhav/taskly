@@ -36,7 +36,9 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
   const [dropdownsLoaded, setDropdownsLoaded] = useState(false);
 
 
-
+  useEffect(() => {
+    setDropdownsLoaded(true);
+  }, []);
   //  Load dropdowns from backend
   // useEffect(() => {
   //   fetch("http://localhost/taskly/taskly/backend/getOptions.php")

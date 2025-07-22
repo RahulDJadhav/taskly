@@ -4,7 +4,7 @@ import TodoListCard from './TodoListCard';
 import TaskFilterCard from './TaskFilterCard';
 
 // 1. Accept new props: activeFilter, onFilterChange, taskCounts
-const MainContent = ({ tasks, onDelete, onEdit, onDone, onToggleFavorite, activeFilter, onFilterChange, taskCounts }) => {
+const MainContent = ({ tasks, onDelete, onEdit, onDone, onToggleFavorite, activeFilter, onFilterChange, taskCounts, onToggleImportant }) => {
 
   // 2. Filter tasks based on activeFilter
   const filteredTasks = tasks.filter(task => {
@@ -12,14 +12,13 @@ const MainContent = ({ tasks, onDelete, onEdit, onDone, onToggleFavorite, active
       return true; // Show all tasks
     }
     if (activeFilter === 'Done') {
-      return task.status === 'Done';
+      return task.is_done;
     }
-    if (activeFilter === 'My Task') {
-      // Assuming 'My Task' means tasks assigned to 'Rahul Jadhav' AND not yet 'Done'
-      return task.assignee === 'Rahul Jadhav' && task.status !== 'Done';
+    if (activeFilter === 'Important') {
+      return task.is_important;
     }
     if (activeFilter === 'Favorites') {
-      return task.isFavorite === true; // Show only favorited tasks
+      return task.is_favorite; // Show only favorited tasks
     }
     if (activeFilter === 'Due Soon') { // <-- ADD THIS NEW FILTER LOGIC
       if (!task.dueDate || task.status === 'Done') return false; // Not due soon if no date or already done
@@ -49,8 +48,9 @@ const MainContent = ({ tasks, onDelete, onEdit, onDone, onToggleFavorite, active
           data={filteredTasks} // Pass the FILTERED tasks to TodoListCard
           onEdit={onEdit}
           onDelete={onDelete}
-          // onDone={onDone}
+          onDone={onDone}
           onToggleFavorite={onToggleFavorite} // Pass this down to TodoListCard
+          onToggleImportant={onToggleImportant}
         />
       </div>
 

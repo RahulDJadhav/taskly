@@ -22,12 +22,12 @@ const Login = ({ onLogin }) => {
 
   const handleLogin = (e) => {
     e.preventDefault(); // Prevent default form submission
-  
+
     if (!email || !password) {
       setError('Please enter both email and password');
       return;
     }
-  
+
     fetch(`${API_BASE}loginUser.php`, {
       method: 'POST',
       headers: {
@@ -49,8 +49,8 @@ const Login = ({ onLogin }) => {
         setError('Something went wrong.');
       });
   };
-  
-  
+
+
 
   return (
     <div className="d-flex vh-100">
@@ -63,7 +63,13 @@ const Login = ({ onLogin }) => {
         }}
       >
         <div className="text-center">
-          <FontAwesomeIcon icon={faTasks} size="5x" className="mb-4" />
+          <img
+            src="/xts_white.png" // or your logo path
+            alt="Company Logo"
+            style={{ width: 350, height: 120, marginBottom: 24 }}
+          />
+          {/* Optionally keep the FontAwesome icon below or remove it */}
+          {/* <FontAwesomeIcon icon={faTasks} size="5x" className="mb-4" /> */}
           <h1 className="display-4 fw-bold mb-3">Welcome to Taskly</h1>
           <p className="lead">Your ultimate task management solution.</p>
         </div>

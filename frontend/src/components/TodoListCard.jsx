@@ -3,12 +3,14 @@ import styles from './TodoListCard.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as farStar, faHeart as farHeart } from '@fortawesome/free-regular-svg-icons';
 import { faEllipsisH, faSquare } from '@fortawesome/free-solid-svg-icons';
-import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons'; // filled
-import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons'; // outlined
+// import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
+// import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
+import { faStar as solidStar, faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
+import { faStar as regularStar, faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
 import TaskOptions from './TaskOptions';
 import TaskTextToggle from './TaskTextToggle';
 
-const TodoListCard = ({ data, onEdit, onDelete, onDone, onToggleFavorite }) => {
+const TodoListCard = ({ data, onEdit, onDelete, onDone, onToggleFavorite, onToggleImportant }) => {
 
 
   if (data.length === 0) {
@@ -32,17 +34,20 @@ const TodoListCard = ({ data, onEdit, onDelete, onDone, onToggleFavorite }) => {
               <input
                 className={`form-check-input me-2 ${styles.checkbox}`}
                 type="checkbox"
-              // id={`check-${task.id}`}
-              // checked={task.status === 'Done'} 
-              // onChange={() => onDone && onDone(task.id)} 
+                id={`check-${task.id}`}
+                checked={!!task.is_done}
+                onChange={() => onDone && onDone(task.id, task.is_done)}
               />
-              <FontAwesomeIcon icon={farStar} className="me-2" />
-              {/* 3. Make the Heart icon toggle Favorite status */}
+              {/* {console.log(`Task ID: ${task.id}, is_done: ${task.is_done}, checked: ${!!task.is_done}`)} */}
               <FontAwesomeIcon
-                icon={task.isFavorite ? solidHeart : regularHeart}
-                className="me-2"
-                style={{ cursor: 'pointer', color: task.isFavorite ? '#ff69b4' : '#6c757d' }}
-                onClick={() => onToggleFavorite && onToggleFavorite(task.id, task.isFavorite)}
+                icon={task.is_important ? solidStar : regularStar}
+                style={{ color: task.is_important ? 'gold' : '#6c757d', cursor: 'pointer' }}
+                onClick={() => onToggleImportant && onToggleImportant(task.id, task.is_important)}
+              />
+              <FontAwesomeIcon
+                icon={task.is_favorite ? solidHeart : regularHeart}
+                style={{ color: task.is_favorite ? 'red' : '#6c757d', cursor: 'pointer' }}
+                onClick={() => onToggleFavorite && onToggleFavorite(task.id, task.is_favorite)}
               />
             </div>
           </div>
