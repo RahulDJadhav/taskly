@@ -21,6 +21,9 @@ $result = $conn->query("SELECT * FROM todotasks");
 $tasks = [];
 
 while ($row = $result->fetch_assoc()) {
+  $row['is_done'] = (int)$row['is_done'];
+  $row['is_important'] = (int)$row['is_important'];
+  $row['is_favorite'] = (int)$row['is_favorite'];
   $tasks[] = $row;
 }
 

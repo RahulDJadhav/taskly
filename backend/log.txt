@@ -1,1 +1,1 @@
-{"id":1753106339090,"title":"demo task 123","startDate":"2025-07-10","dueDate":"2025-07-10","description":"demo task 123","priority":"Medium","status":"Open","assignee":"","isFavorite":false}
+{"id":1753178769340,"title":"asddsad","startDate":"2025-07-11","dueDate":"2025-07-16","description":"sad","priority":"Medium","status":"On Hold","assignee":"","is_important":false,"is_favorite":false,"is_done":false}

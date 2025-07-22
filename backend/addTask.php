@@ -35,6 +35,7 @@ if (
     isset($data->priority) && isset($data->status) &&
     isset($data->assignee)
 ) {
+    // Extract and sanitize fields as needed
     $title = $conn->real_escape_string($data->title);
     $description = $conn->real_escape_string($data->description ?? '');
     $startDate = $conn->real_escape_string($data->startDate);
@@ -42,13 +43,19 @@ if (
     $priority = $conn->real_escape_string($data->priority);
     $status = $conn->real_escape_string($data->status);
     // $assignee = $conn->real_escape_string($data->assignee);
-    $isFavorite = $conn->real_escape_string($data->isFavorite);
+    $is_favorite = isset($data->is_favorite) ? intval($data->is_favorite) : 0;
+    $is_important = isset($data->is_important) ? intval($data->is_important) : 0;
+    $is_done = isset($data->is_done) ? intval($data->is_done) : 0;
     $createdBy = 1;
 
+    // $sql = "INSERT INTO todotasks 
+    //     (title, description, start_date, due_date, priority, status, is_favorite, created)
+    //     VALUES 
+    //     ('$title', '$description', '$startDate', '$dueDate', '$priority', '$status', 0, $createdBy)";
     $sql = "INSERT INTO todotasks 
-        (title, description, start_date, due_date, priority, status, is_favorite, created)
-        VALUES 
-        ('$title', '$description', '$startDate', '$dueDate', '$priority', '$status', 0, $createdBy)";
+    (title, description, start_date, due_date, priority, status, is_favorite, is_important, is_done, created)
+    VALUES 
+    ('$title', '$description', '$startDate', '$dueDate', '$priority', '$status', $is_favorite, $is_important, $is_done, $createdBy)";
 
     if ($conn->query($sql) === TRUE) {
         echo json_encode(["message" => "Task added successfully."]);

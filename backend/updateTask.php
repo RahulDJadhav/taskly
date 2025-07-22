@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+error_reporting(E_ALL);
+ini_set('error_log', __DIR__ . '/debug.log');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: POST");
@@ -32,7 +36,7 @@ if (
               due_date='$dueDate', 
               description='$description', 
               priority='$priority', 
-              status='$status', 
+              status='$status'
             --   assignee='$assignee' 
             WHERE id=$id";
 
