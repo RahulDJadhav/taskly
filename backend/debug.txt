@@ -213,3 +213,13 @@ Array
     [id] => 3
     [is_favorite] => 0
 )
+Array
+(
+    [id] => 4
+    [is_favorite] => 1
+)
+Array
+(
+    [id] => 6
+    [is_important] => 1
+)
