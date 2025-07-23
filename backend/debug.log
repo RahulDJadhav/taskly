@@ -22,3 +22,6 @@ ID: 0, isFavorite: 0
 [23-Jul-2025 07:13:22 Europe/Berlin] PHP Notice:  Undefined variable: assignee in C:\xampp\htdocs\taskly\taskly\backend\updateTask.php on line 40
 [23-Jul-2025 07:36:03 Europe/Berlin] PHP Notice:  Undefined variable: assignee in C:\xampp\htdocs\taskly\taskly\backend\updateTask.php on line 40
 [23-Jul-2025 07:46:32 Europe/Berlin] PHP Notice:  Undefined variable: assignee in C:\xampp\htdocs\taskly\taskly\backend\updateTask.php on line 40
+[23-Jul-2025 11:16:40 Europe/Berlin] PHP Notice:  Undefined variable: assignee in C:\xampp\htdocs\taskly\taskly\backend\updateTask.php on line 40
+[23-Jul-2025 11:16:49 Europe/Berlin] PHP Notice:  Undefined variable: assignee in C:\xampp\htdocs\taskly\taskly\backend\updateTask.php on line 40
+[23-Jul-2025 11:16:55 Europe/Berlin] PHP Notice:  Undefined variable: assignee in C:\xampp\htdocs\taskly\taskly\backend\updateTask.php on line 40
