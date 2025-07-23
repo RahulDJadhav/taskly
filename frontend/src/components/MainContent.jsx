@@ -8,20 +8,26 @@ const MainContent = ({ tasks, onDelete, onEdit, onDone, onToggleFavorite, active
 
   // 2. Filter tasks based on activeFilter
   const filteredTasks = tasks.filter(task => {
+    // Exclude done tasks from all filters except 'Done'
+    if (activeFilter !== 'Done' && !!task.is_done) {
+      return false; // Don't show done tasks in other filters
+    }
+
     if (activeFilter === 'All') {
-      return true; // Show all tasks
+      return true; // Show all remaining tasks (not done, or done if activeFilter is 'Done')
     }
     if (activeFilter === 'Done') {
-      return task.is_done;
+      return !!task.is_done; // Only show done tasks
     }
     if (activeFilter === 'Important') {
-      return task.is_important;
+      return !!task.is_important; // Only show important tasks (that are not done)
     }
     if (activeFilter === 'Favorites') {
-      return task.is_favorite; // Show only favorited tasks
+      return !!task.is_favorite; // Only show favorited tasks (that are not done)
     }
-    if (activeFilter === 'Due Soon') { // <-- ADD THIS NEW FILTER LOGIC
-      if (!task.dueDate || task.status === 'Done') return false; // Not due soon if no date or already done
+    if (activeFilter === 'Due Soon') {
+      if (!task.due_date) return false;
+      // task.is_done check is handled by the first global exclusion
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -30,7 +36,7 @@ const MainContent = ({ tasks, onDelete, onEdit, onDone, onToggleFavorite, active
       sevenDaysFromNow.setDate(today.getDate() + 7);
       sevenDaysFromNow.setHours(23, 59, 59, 999);
 
-      const taskDueDate = new Date(task.dueDate);
+      const taskDueDate = new Date(task.due_date);
       taskDueDate.setHours(0, 0, 0, 0);
 
       // Task is due soon if its date is today or in future, and within 7 days, and not done

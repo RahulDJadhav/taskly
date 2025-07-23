@@ -43,26 +43,37 @@ const TodoListCard = ({ data, onEdit, onDelete, onDone, onToggleFavorite, onTogg
                 icon={task.is_important ? solidStar : regularStar}
                 style={{ color: task.is_important ? 'gold' : '#6c757d', cursor: 'pointer' }}
                 onClick={() => onToggleImportant && onToggleImportant(task.id, task.is_important)}
+                className="me-2" // Added margin-end here
               />
               <FontAwesomeIcon
                 icon={task.is_favorite ? solidHeart : regularHeart}
                 style={{ color: task.is_favorite ? 'red' : '#6c757d', cursor: 'pointer' }}
                 onClick={() => onToggleFavorite && onToggleFavorite(task.id, task.is_favorite)}
+                className="me-2" // Added margin-end here
               />
             </div>
           </div>
-          <div className="col-md-10 d-flex  justify-content-between align-items-center">
-            <span className={`fw-semibold ${styles.fixedWidth}`}><TaskTextToggle text={task.title} maxLength={15} /></span>
-            <span className={`text-muted small me-3 `}>{task.dueDate}</span>
-            <span className={`text-muted small  ${styles.fixedWidth}`}><TaskTextToggle text={task.description} maxLength={20} /></span>
-            <span className={`badge 
-              ${task.priority === 'Urgent' ? 'bg-danger'
-                : task.priority === 'High' ? 'bg-warning'
-                  : task.priority === 'Medium' ? 'bg-success'
-                    : 'bg-secondary'
-              } `}>{task.priority}</span>
-            <span className={`text-muted small `}>{task.status}</span>
-
+          <div className="col-md-10 d-flex align-items-center">
+            <div className="col-md-3">
+              <span className="fw-semibold"><TaskTextToggle text={task.title} maxLength={25} /></span> {/* Increased maxLength for title */}
+            </div>
+            <div className="col-md-2">
+              <span className="text-muted small">{task.due_date}</span> {/* Changed to task.due_date */}
+            </div>
+            <div className="col-md-4">
+              <span className="text-muted small"><TaskTextToggle text={task.description} maxLength={40} /></span> {/* Increased maxLength for description */}
+            </div>
+            <div className="col-md-1 text-center">
+              <span className={`badge 
+                ${task.priority === 'Urgent' ? 'bg-danger'
+                  : task.priority === 'High' ? 'bg-warning'
+                    : task.priority === 'Medium' ? 'bg-success'
+                      : 'bg-secondary'
+                } `}>{task.priority}</span>
+            </div>
+            <div className="col-md-2 text-center">
+              <span className="text-muted small">{task.status}</span>
+            </div>
           </div>
           <div className="col-md-1 d-flex justify-content-end">
             <TaskOptions

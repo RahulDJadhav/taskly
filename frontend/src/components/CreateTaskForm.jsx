@@ -156,8 +156,11 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
 
             <div className="modal-body bg-light px-4 pt-4 pb-2">
               <div className="bg-white p-4 rounded-4 shadow-sm">
-                <div className="row g-3">
-                  <div className="col-md-6">
+
+                {/* Task Details Section */}
+                <h6 className="text-muted text-uppercase mb-3">Task Details</h6>
+                <div className="row g-3 mb-4">
+                  <div className="col-md-12"> {/* Changed to col-md-12 for full width */}
                     <label className="form-label fw-medium">Task Title</label>
                     <input
                       type="text"
@@ -165,28 +168,6 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
                       placeholder="e.g. Design login screen"
                       value={taskTitle}
                       onChange={(e) => setTaskTitle(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="col-md-3">
-                    <label className="form-label fw-medium">Start Date</label>
-                    <input
-                      type="date"
-                      className="form-control rounded-3"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="col-md-3">
-                    <label className="form-label fw-medium">Due Date</label>
-                    <input
-                      type="date"
-                      className="form-control rounded-3"
-                      value={taskDate}
-                      onChange={(e) => setTaskDate(e.target.value)}
                       required
                     />
                   </div>
@@ -201,8 +182,38 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
                       onChange={(e) => setDescription(e.target.value)}
                     ></textarea>
                   </div>
+                </div>
 
-                  <div className="col-md-4">
+                {/* Dates Section */}
+                <h6 className="text-muted text-uppercase mb-3">Dates</h6>
+                <div className="row g-3 mb-4">
+                  <div className="col-md-6">
+                    <label className="form-label fw-medium">Start Date</label>
+                    <input
+                      type="date"
+                      className="form-control rounded-3"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label fw-medium">Due Date</label>
+                    <input
+                      type="date"
+                      className="form-control rounded-3"
+                      value={taskDate}
+                      onChange={(e) => setTaskDate(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Categorization Section */}
+                <h6 className="text-muted text-uppercase mb-3">Categorization</h6>
+                <div className="row g-3">
+                  <div className="col-md-6">
                     <label className="form-label fw-medium">Priority</label>
                     <select
                       className="form-select"
@@ -217,7 +228,7 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
                     </select>
                   </div>
 
-                  <div className="col-md-4">
+                  <div className="col-md-6">
                     <label className="form-label fw-medium">Status</label>
                     <select
                       className="form-select"
@@ -232,6 +243,7 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
                     </select>
                   </div>
 
+                  {/* Assignee is commented out in your original code, so keeping it commented */}
                   {/* <div className="col-md-4">
                     <label className="form-label fw-medium">Assignee</label>
                     <select

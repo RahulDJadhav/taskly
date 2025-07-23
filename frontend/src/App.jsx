@@ -40,6 +40,7 @@ const App = () => {
   const handleAddTask = (newTask) => {
     const taskWithDefaults = {
       ...newTask,
+      due_date: newTask.dueDate, // Ensure snake_case for backend
       is_important: false,
       is_favorite: false,
       is_done: false,
@@ -81,7 +82,10 @@ const App = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(updatedTask)
+        body: JSON.stringify({
+          ...updatedTask,
+          due_date: updatedTask.dueDate // Ensure snake_case for backend
+        })
       });
 
       const result = await res.json();
@@ -166,7 +170,15 @@ const App = () => {
   // };
   const handleDoneTask = async (id, isCurrentlyDone) => {
     const newDoneStatus = (Number(isCurrentlyDone) === 1) ? 0 : 1;
-    // const newDoneStatus = isCurrentlyDone == "0" ? 1 : 0; // Previous attempt
+
+    const confirmMessage = newDoneStatus === 1
+      ? "Are you sure you want to mark this task as Done?"
+      : "Are you sure you want to mark this task as Open?";
+
+    if (!window.confirm(confirmMessage)) {
+      return; // User cancelled
+    }
+
     try {
       const res = await fetch(`${API_BASE}updateStatus.php`, {
         method: 'POST',
