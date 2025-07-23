@@ -104,7 +104,7 @@ const Login = ({ onLogin }) => {
                 required
               />
             </div>
-            <button type="submit" onClick={handleLogin} className="btn w-100 py-2 fw-bold text-white" style={{ backgroundColor: '#4d46e1', border: 'none', borderRadius: '8px' }}>
+            <button type="submit" onClick={handleLogin} className="btn w-100 py-2 fw-bold text-white btn-primary-taskly" style={{ backgroundColor: '#4d46e1', border: 'none', borderRadius: '8px' }}>
               Login
             </button>
             <div className="text-center mt-3">
