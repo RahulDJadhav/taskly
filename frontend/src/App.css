@@ -26,3 +26,8 @@
   opacity: 1;
   transition: opacity 0.3s ease-in-out;
 }
+
+.custom-datepicker {
+  display: block !important;
+  width: 100% !important;
+}

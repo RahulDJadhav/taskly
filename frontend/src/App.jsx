@@ -168,41 +168,82 @@ const App = () => {
   //   setSuccessMessage('Task Done Successfully!');
   //   setTimeout(() => setSuccessMessage(''), 1000);
   // };
+  // const handleDoneTask = async (id, isCurrentlyDone) => {
+  //   const newDoneStatus = (Number(isCurrentlyDone) === 1) ? 0 : 1;
+
+  //   const confirmMessage = newDoneStatus === 1
+  //     ? "Are you sure you want to mark this task as Done?"
+  //     : "Are you sure you want to mark this task as Open?";
+
+  //   if (!window.confirm(confirmMessage)) {
+  //     return; // User cancelled
+  //   }
+
+  //   try {
+  //     const res = await fetch(`${API_BASE}updateStatus.php`, {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ id, is_done: newDoneStatus })
+  //     });
+  //     const result = await res.json();
+  //     if (result.message === 'Done status updated') {
+  //       const taskRes = await fetch(`${API_BASE}getTasks.php`);
+  //       const data = await taskRes.json();
+  //       setTasks(data);
+  //       // setSuccessMessage(`Task marked as ${newDoneStatus ? 'Done' : 'Open'} successfully!`);
+  //       setSuccessMessage(
+  //         (Number(isCurrentlyDone) === 1)
+  //           ? "Task marked as Open successfully!"
+  //           : "Task marked as Done successfully!"
+  //       );
+  //       setTimeout(() => setSuccessMessage(''), 1000);
+  //     } else {
+  //       throw new Error(result.message);
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert('Failed to update task done status');
+  //   }
+  // };
+
   const handleDoneTask = async (id, isCurrentlyDone) => {
-    const newDoneStatus = (Number(isCurrentlyDone) === 1) ? 0 : 1;
+    const newDoneStatus = Number(isCurrentlyDone) === 1 ? 0 : 1;
+    const newStatus = newDoneStatus === 1 ? 'Completed' : 'Open';
 
     const confirmMessage = newDoneStatus === 1
       ? "Are you sure you want to mark this task as Done?"
       : "Are you sure you want to mark this task as Open?";
 
     if (!window.confirm(confirmMessage)) {
-      return; // User cancelled
+      return;
     }
 
     try {
       const res = await fetch(`${API_BASE}updateStatus.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, is_done: newDoneStatus })
+        body: JSON.stringify({ id, is_done: newDoneStatus, status: newStatus })
       });
+
       const result = await res.json();
-      if (result.message === 'Done status updated') {
+
+      if (result.message && result.message.toLowerCase().includes("updated")) {
         const taskRes = await fetch(`${API_BASE}getTasks.php`);
         const data = await taskRes.json();
         setTasks(data);
-        // setSuccessMessage(`Task marked as ${newDoneStatus ? 'Done' : 'Open'} successfully!`);
+
         setSuccessMessage(
-          (Number(isCurrentlyDone) === 1)
-            ? "Task marked as Open successfully!"
-            : "Task marked as Done successfully!"
+          newDoneStatus === 1
+            ? "Task marked as Done and Completed successfully!"
+            : "Task reopened and status set to Open."
         );
         setTimeout(() => setSuccessMessage(''), 1000);
       } else {
-        throw new Error(result.message);
+        alert("Error: " + result.message);
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to update task done status');
+      alert('Failed to update task status');
     }
   };
 

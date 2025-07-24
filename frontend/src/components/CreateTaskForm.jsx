@@ -1,6 +1,9 @@
 import React, { useState, useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit } from '@fortawesome/free-solid-svg-icons';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import '../App.css';
 
 const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
   const modalRef = useRef(null);
@@ -9,8 +12,8 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
   // Form state
   const [editingId, setEditingId] = useState(null);
   const [taskTitle, setTaskTitle] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [taskDate, setTaskDate] = useState('');
+  const [startDate, setStartDate] = useState(null);
+  const [dueDate, setDueDate] = useState(null);
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('');
   const [status, setStatus] = useState('');
@@ -32,25 +35,12 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
   // Dropdown data
   const [priorities] = useState(PRIORITY_OPTIONS);
   const [statuses] = useState(STATUS_OPTIONS);
-  const [users, setUsers] = useState([]);
   const [dropdownsLoaded, setDropdownsLoaded] = useState(false);
 
 
   useEffect(() => {
     setDropdownsLoaded(true);
   }, []);
-  //  Load dropdowns from backend
-  // useEffect(() => {
-  //   fetch("http://localhost/taskly/taskly/backend/getOptions.php")
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       setPriorities(data.priorities || []);
-  //       setStatuses(data.statuses || []);
-  //       setUsers(data.users || []);
-  //       setDropdownsLoaded(true); // ✅ set flag
-  //     })
-  //     .catch(err => console.error("Failed to load dropdowns", err));
-  // }, []);
 
   //  Open modal and populate task if provided
   useImperativeHandle(ref, () => ({
@@ -71,7 +61,7 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
                   ? task.start_date.substring(0, 10)
                   : ''
             );
-            setTaskDate(
+            setDueDate(
               task.dueDate
                 ? task.dueDate.substring(0, 10)
                 : task.due_date
@@ -94,7 +84,7 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
         setEditingId(null);
         setTaskTitle('');
         setStartDate('');
-        setTaskDate('');
+        setDueDate('');
         setDescription('');
         setPriority('');
         setStatus('');
@@ -106,21 +96,61 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
   }));
 
   //  Form submit
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+
+  //   const today = new Date().toISOString().split("T")[0];
+
+  //   if (dueDate < today) {
+  //     alert("Due date cannot be in the past.");
+  //     return;
+  //   }
+
+  //   if (startDate && dueDate && dueDate < startDate) {
+  //     alert("Due date cannot be earlier than start date.");
+  //     return;
+  //   }
+
+  //   const taskData = {
+  //     id: editingId || Date.now(),
+  //     title: taskTitle,
+  //     startDate: startDate,
+  //     dueDate: dueDate,
+  //     description,
+  //     priority: priority,
+  //     status: status,
+  //     assignee: assignee
+  //   };
+
+  //   if (editingId) {
+  //     onUpdate && onUpdate(taskData);
+  //   } else {
+  //     onSubmit && onSubmit(taskData);
+  //   }
+
+  //   modalInstanceRef.current.hide();
+
+  //   setEditingId(null);
+  //   setTaskTitle('');
+  //   setStartDate('');
+  //   setDueDate('');
+  //   setDescription('');
+  //   setPriority('');
+  //   setStatus('');
+  //   setAssignee('');
+  // };
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const taskData = {
       id: editingId || Date.now(),
       title: taskTitle,
-      startDate: startDate,
-      dueDate: taskDate,
+      startDate: startDate instanceof Date ? startDate.toISOString().split('T')[0] : '',
+      dueDate: dueDate instanceof Date ? dueDate.toISOString().split('T')[0] : '',
       description,
-      // priority: Number(priority),
-      // status: Number(status),
-      // assignee: Number(assignee)
-      priority: priority,
-      status: status,
-      assignee: assignee
+      priority,
+      status,
+      assignee,
     };
 
     if (editingId) {
@@ -131,16 +161,18 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
 
     modalInstanceRef.current.hide();
 
-    // Clear form
+    // Reset form
     setEditingId(null);
     setTaskTitle('');
     setStartDate('');
-    setTaskDate('');
+    setDueDate('');
     setDescription('');
     setPriority('');
     setStatus('');
     setAssignee('');
   };
+
+
 
   return (
     <div className="modal fade" ref={modalRef} tabIndex="-1" aria-hidden="true">
@@ -165,7 +197,7 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
                     <input
                       type="text"
                       className="form-control rounded-3"
-                      placeholder="e.g. Design login screen"
+                      placeholder="Add task title..."
                       value={taskTitle}
                       onChange={(e) => setTaskTitle(e.target.value)}
                       required
@@ -189,26 +221,37 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
                 <div className="row g-3 mb-4">
                   <div className="col-md-6">
                     <label className="form-label fw-medium">Start Date</label>
-                    <input
-                      type="date"
-                      className="form-control rounded-3"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      required
-                    />
+                    <div className="d-grid">
+                      <DatePicker
+                        selected={startDate}
+                        onChange={(date) => {
+                          setStartDate(date);
+                          if (dueDate && date && dueDate < date) setDueDate(null);
+                        }}
+                        className="form-control rounded-3 custom-datepicker"
+                        dateFormat="yyyy-MM-dd"
+                        placeholderText="Select start date"
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div className="col-md-6">
                     <label className="form-label fw-medium">Due Date</label>
-                    <input
-                      type="date"
-                      className="form-control rounded-3"
-                      value={taskDate}
-                      onChange={(e) => setTaskDate(e.target.value)}
-                      required
-                    />
+                    <div className="d-grid">
+                      <DatePicker
+                        selected={dueDate}
+                        onChange={(date) => setDueDate(date)}
+                        className="form-control rounded-3 custom-datepicker"
+                        dateFormat="yyyy-MM-dd"
+                        placeholderText="Select due date"
+                        minDate={startDate || new Date()}
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
+
 
                 {/* Categorization Section */}
                 <h6 className="text-muted text-uppercase mb-3">Categorization</h6>
@@ -242,22 +285,6 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
                       ))}
                     </select>
                   </div>
-
-                  {/* Assignee is commented out in your original code, so keeping it commented */}
-                  {/* <div className="col-md-4">
-                    <label className="form-label fw-medium">Assignee</label>
-                    <select
-                      className="form-select"
-                      value={assignee}
-                      onChange={(e) => setAssignee(e.target.value)}
-                      required
-                    >
-                      <option value="">Select</option>
-                      {users.map(user => (
-                        <option key={user.name} value={user.name}>{user.name}</option>
-                      ))}
-                    </select>
-                  </div> */}
                 </div>
               </div>
             </div>
