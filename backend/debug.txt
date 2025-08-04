@@ -353,3 +353,33 @@ Array
     [id] => 6
     [is_important] => 0
 )
+Array
+(
+    [id] => 15
+    [is_favorite] => 1
+)
+Array
+(
+    [id] => 15
+    [is_favorite] => 0
+)
+Array
+(
+    [id] => 42
+    [is_favorite] => 1
+)
+Array
+(
+    [id] => 42
+    [is_important] => 1
+)
+Array
+(
+    [id] => 42
+    [is_favorite] => 0
+)
+Array
+(
+    [id] => 42
+    [is_important] => 0
+)

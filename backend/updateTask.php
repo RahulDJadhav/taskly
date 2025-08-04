@@ -1,11 +1,20 @@
 <?php
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-error_reporting(E_ALL);
-ini_set('error_log', __DIR__ . '/debug.log');
-header("Access-Control-Allow-Origin: *");
+session_start();
+
+// STEP 1: Handle preflight CORS request
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header("Access-Control-Allow-Origin: http://localhost:3000");
+    header("Access-Control-Allow-Credentials: true");
+    header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type");
+    header("Content-Type: application/json");
+    exit(0);
+}
+header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: POST");
+header("Content-Type: application/json");
 
 $conn = new mysqli("localhost", "root", "", "taskly");
 
@@ -21,7 +30,11 @@ if (
     // &&
     // isset($data->status) && isset($data->assignee)
 ) {
-    $id = (int)$data->id;
+    $user_id = isset($data->user_id) ? intval($data->user_id) : 0;
+if (!$user_id) {
+    echo json_encode(['error' => 'Not authenticated']);
+    exit;
+}
     $title = $conn->real_escape_string($data->title);
     $startDate = $conn->real_escape_string($data->startDate);
     $dueDate = $conn->real_escape_string($data->dueDate);
@@ -38,7 +51,7 @@ if (
               priority='$priority', 
               status='$status'
             --   assignee='$assignee' 
-            WHERE id=$id";
+            WHERE id=$id AND user_id=$user_id";
 
     if ($conn->query($sql)) {
         echo json_encode(["message" => "Task updated successfully."]);

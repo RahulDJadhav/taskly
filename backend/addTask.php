@@ -1,4 +1,7 @@
+
 <?php
+session_start();
+
 // STEP 1: Handle preflight CORS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header("Access-Control-Allow-Origin: *");
@@ -8,7 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // STEP 2: Allow actual request
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
@@ -46,16 +50,22 @@ if (
     $is_favorite = isset($data->is_favorite) ? intval($data->is_favorite) : 0;
     $is_important = isset($data->is_important) ? intval($data->is_important) : 0;
     $is_done = isset($data->is_done) ? intval($data->is_done) : 0;
-    $createdBy = 1;
+    // $createdBy = 1;
+    // Extract user_id from request
+    $user_id = isset($data->user_id) ? intval($data->user_id) : 0;
+if (!$user_id) {
+    echo json_encode(['error' => 'Not authenticated']);
+    exit;
+}
 
     // $sql = "INSERT INTO todotasks 
     //     (title, description, start_date, due_date, priority, status, is_favorite, created)
     //     VALUES 
     //     ('$title', '$description', '$startDate', '$dueDate', '$priority', '$status', 0, $createdBy)";
     $sql = "INSERT INTO todotasks 
-    (title, description, start_date, due_date, priority, status, is_favorite, is_important, is_done, created)
-    VALUES 
-    ('$title', '$description', '$startDate', '$dueDate', '$priority', '$status', $is_favorite, $is_important, $is_done, $createdBy)";
+  (user_id, title, description, start_date, due_date, priority, status, is_favorite, is_important, is_done)
+  VALUES 
+  ($user_id, '$title', '$description', '$startDate', '$dueDate', '$priority', '$status', $is_favorite, $is_important, $is_done)";
 
     if ($conn->query($sql) === TRUE) {
         echo json_encode(["message" => "Task added successfully."]);

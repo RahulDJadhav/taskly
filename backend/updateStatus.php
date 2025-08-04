@@ -1,58 +1,48 @@
 <?php
-// header("Access-Control-Allow-Origin: *");
-// header("Access-Control-Allow-Headers: Content-Type");
-// header("Access-Control-Allow-Methods: POST, OPTIONS");
-// if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-//     http_response_code(200);
-//     exit();
-// }
+session_start();
 
-// include 'db.php';
-
-// $data = json_decode(file_get_contents("php://input"));
-// $id = $data->id;
-// $is_done = $data->is_done; // 0 or 1
-
-// $query = "UPDATE todotasks SET is_done = $is_done WHERE id = $id";
-// if (mysqli_query($conn, $query)) {
-//   echo json_encode(["message" => "Done status updated"]);
-// } else {
-//   echo json_encode(["message" => "Error updating done status"]);
-// }
-?>
-<?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
+// STEP 1: Handle preflight CORS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
+    header("Access-Control-Allow-Origin: http://localhost:3000");
+    header("Access-Control-Allow-Credentials: true");
+    header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type");
+    header("Content-Type: application/json");
+    exit(0);
 }
+
+// STEP 2: Allow actual request
+header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Content-Type: application/json");
 
 include 'db.php';
 
-$data = json_decode(file_get_contents("php://input"));
-$id = $data->id;
-$is_done = isset($data->is_done) ? intval($data->is_done) : null;
-$status = isset($data->status) ? $data->status : null;
-
-// Build dynamic query
-$updates = [];
-if (!is_null($is_done)) {
-    $updates[] = "is_done = $is_done";
-}
-if (!is_null($status)) {
-    $updates[] = "status = '" . mysqli_real_escape_string($conn, $status) . "'";
+// Check session user
+$user_id = $_SESSION['user_id'] ?? null;
+if (!$user_id) {
+    echo json_encode(['error' => 'Not authenticated']);
+    exit;
 }
 
-if (count($updates) > 0) {
-    $query = "UPDATE todotasks SET " . implode(", ", $updates) . " WHERE id = $id";
-    if (mysqli_query($conn, $query)) {
-        echo json_encode(["message" => "Done status and/or status updated"]);
-    } else {
-        echo json_encode(["message" => "Error updating status"]);
-    }
+$data = json_decode(file_get_contents('php://input'), true);
+$id = isset($data['id']) ? intval($data['id']) : 0;
+$is_done = isset($data['is_done']) ? intval($data['is_done']) : 0;
+$status = isset($data['status']) ? $conn->real_escape_string($data['status']) : '';
+$user_id = isset($data['user_id']) ? intval($data['user_id']) : 0;
+if ($id === 0 || $user_id === 0) {
+    echo json_encode(["message" => "Missing id or user_id"]);
+    exit;
+}
+
+$sql = "UPDATE todotasks SET is_done = $is_done, status = '$status' WHERE id = $id AND user_id = $user_id";
+
+if (mysqli_query($conn, $sql)) {
+    echo json_encode(["message" => "Done status and/or status updated"]);
 } else {
-    echo json_encode(["message" => "No data to update"]);
+    echo json_encode(["message" => "Error updating status"]);
 }
+$conn->close();
 ?>

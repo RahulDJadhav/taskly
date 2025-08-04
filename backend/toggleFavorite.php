@@ -1,39 +1,50 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
+session_start();
+
+// STEP 1: Handle preflight CORS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
+    header("Access-Control-Allow-Origin: http://localhost:3000");
+    header("Access-Control-Allow-Credentials: true");
+    header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type");
+    header("Content-Type: application/json");
+    exit(0);
 }
 
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-error_reporting(E_ALL);
-ini_set('error_log', __DIR__ . '/debug.log');
+// STEP 2: Allow actual request
+header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Content-Type: application/json");
 
-header('Content-Type: application/json');
+require_once 'db.php';
 
-require_once 'db.php'; // Assumes db.php sets up $conn (mysqli)
-
-// Get POST data
-$data = json_decode(file_get_contents('php://input'), true);
-
-if (!isset($data['id']) || !isset($data['is_favorite'])) {
-    echo json_encode(['message' => 'Missing required parameters.']);
+// Check session user
+$user_id = $_SESSION['user_id'] ?? null;
+if (!$user_id) {
+    echo json_encode(['error' => 'Not authenticated']);
     exit;
 }
 
-$id = intval($data['id']);
-$is_favorite = intval($data['is_favorite']); // 0 or 1
-file_put_contents('debug.txt', print_r($data, true), FILE_APPEND);
-$sql = "UPDATE todotasks SET is_favorite=? WHERE id=?";
+// Get POST data
+$data = json_decode(file_get_contents('php://input'), true);
+$id = isset($data['id']) ? intval($data['id']) : 0;
+$is_favorite = isset($data['is_favorite']) ? intval($data['is_favorite']) : 0;
+$user_id = isset($data['user_id']) ? intval($data['user_id']) : 0;
+if ($id === 0 || $user_id === 0) {
+    echo json_encode(["message" => "Missing id or user_id"]);
+    exit;
+}
+
+// Only update if the task belongs to the logged-in user
+$sql = "UPDATE todotasks SET is_favorite = $is_favorite WHERE id = $id AND user_id = $user_id";
 $stmt = $conn->prepare($sql);
 if (!$stmt) {
     echo json_encode(['message' => 'Database error: ' . $conn->error]);
     exit;
 }
-$stmt->bind_param('ii', $is_favorite, $id);
+$stmt->bind_param('iii', $is_favorite, $id, $user_id);
 
 if ($stmt->execute()) {
     echo json_encode(['message' => 'Favorite status updated']);
