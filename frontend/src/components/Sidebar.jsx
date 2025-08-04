@@ -1,12 +1,12 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faList, faTrash, faSquareCheck } from '@fortawesome/free-solid-svg-icons';
+import { faChartLine, faSync, faSquareCheck } from '@fortawesome/free-solid-svg-icons';
 import Profile from './Profile';
 import styles from './Sidebar.module.css';
 
 const Sidebar = () => {
-  const sidebarItems = ['My Tasks', 'Completed', 'Analytics'];
-  const sidebarIcons = [faList, faSquareCheck, faTrash];
+  const sidebarItems = ['Dashboard ', 'Recurring Tasks', 'Analytics'];
+  const sidebarIcons = [faChartLine, faSync, faSquareCheck];
 
   return (
     <div className="" style={{ width: 'auto', minHeight: '100vh' }}>

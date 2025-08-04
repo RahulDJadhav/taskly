@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faBell, faSignOutAlt, faTasks } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faBell, faSignOutAlt, faTasks, faPlus } from '@fortawesome/free-solid-svg-icons';
 import AddButton from './AddButton';
 import CreateTaskForm from './CreateTaskForm';
 
@@ -20,7 +20,12 @@ const Header = ({ onAddClick, onLogout }) => {
         </form>
 
         <div className='d-flex align-items-center justify-content-end'>
-          <AddButton label='Add Task' onClick={onAddClick} className="me-4 btn-primary-taskly" />
+          {/* <AddButton label='Add Task' onClick={onAddClick} className="me-4 btn-primary-taskly" /> */}
+          <AddButton
+            onClick={onAddClick}
+            className="me-4 btn-primary-taskly text-white"
+            label={<><FontAwesomeIcon icon={faPlus} className="me-2" />Add Task</>}
+          />
           <FontAwesomeIcon icon={faBell} className="me-4" style={{ cursor: 'pointer', marginLeft: '10px' }} onClick={() => alert('Bell clicked!')} />
 
           <FontAwesomeIcon icon={faSignOutAlt} className="me-2" style={{ cursor: 'pointer' }} title="Logout" onClick={onLogout} />

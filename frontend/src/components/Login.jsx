@@ -1,27 +1,23 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTasks } from '@fortawesome/free-solid-svg-icons';
+import AddButton from './AddButton';
+import styles from './Login.module.css';
 
 const Login = ({ onLogin }) => {
-  // const API_BASE = 'http://localhost/taskly/taskly/backend/';
   const API_BASE = 'http://localhost/taskly/taskly/backend/';
 
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isPasswordMatch, setIsPasswordMatch] = useState(true);
   const [error, setError] = useState('');
-
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   if (email === 'admin@xts.com' && password === 'Admin') {
-  //     setError('');
-  //     onLogin && onLogin();
-  //   } else {
-  //     setError('Invalid email or password');
-  //   }
-  // };
+  const [isSignup, setIsSignup] = useState(false);
 
   const handleLogin = (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
+    setIsPasswordMatch(true);
 
     if (!email || !password) {
       setError('Please enter both email and password');
@@ -30,86 +26,186 @@ const Login = ({ onLogin }) => {
 
     fetch(`${API_BASE}loginUser.php`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, password })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          console.log('Login Success:', data.user);
+          localStorage.setItem("userId", data.user.id);
+          localStorage.setItem("userName", data.user.name);
+          localStorage.setItem("userEmail", data.user.email);
           onLogin();
         } else {
           setError(data.message || 'Login failed');
         }
       })
-      .catch(err => {
-        console.error('Login error:', err);
-        setError('Something went wrong.');
-      });
+      .catch(() => setError('Something went wrong.'));
   };
 
+  const handleSignup = (e) => {
+    e.preventDefault();
+    if (!name || !email || !password || !confirmPassword) {
+      setError('Please fill all fields');
+      return;
+    }
 
+    if (password !== confirmPassword) {
+      setIsPasswordMatch(false);
+      setError('Passwords do not match');
+      return;
+    } else {
+      setIsPasswordMatch(true);
+    }
+
+    fetch(`${API_BASE}signupUser.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password, confirmPassword }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('Signup successful. Please log in.');
+          setIsSignup(false);
+          setEmail('');
+          setPassword('');
+          setConfirmPassword('');
+          setName('');
+          setError('');
+        } else {
+          setError(data.message || 'Signup failed');
+        }
+      })
+      .catch(() => setError('Something went wrong.'));
+  };
+
+  const handleConfirmPasswordKeyUp = (e) => {
+    const value = e.target.value;
+    setConfirmPassword(value);
+    setIsPasswordMatch(value === password);
+  };
 
   return (
-    <div className="d-flex vh-100">
-      <div
-        className="d-none d-md-flex col-md-6 align-items-center justify-content-center"
-        style={{
-          background: 'linear-gradient(to right, #4d46e1, #6a5acd)',
-          color: 'white',
-          padding: '2rem'
-        }}
-      >
+    <div className={styles.container}>
+      <div className={styles.leftPanel}>
         <div className="text-center">
           <img
-            src="/xts_white.png" // or your logo path
-            alt="Company Logo"
-            style={{ width: 350, height: 120, marginBottom: 24 }}
+            src="/xts_white.png"
+            alt="Logo"
+            style={{ width: 300, height: 100, marginBottom: 24 }}
           />
-          {/* Optionally keep the FontAwesome icon below or remove it */}
-          {/* <FontAwesomeIcon icon={faTasks} size="5x" className="mb-4" /> */}
-          <h1 className="display-4 fw-bold mb-3">Welcome to Taskly</h1>
+          <h1 className="display-5 fw-bold mb-3">Welcome to Taskly</h1>
           <p className="lead">Your ultimate task management solution.</p>
         </div>
       </div>
 
-      <div className="col-12 col-md-6 d-flex align-items-center justify-content-center bg-light p-4">
-        <div className="card shadow p-5 border-0 rounded-4" style={{ minWidth: 320, maxWidth: 400, width: '90%' }}>
+      <div className={styles.rightPanel}>
+        <div className={styles.card}>
           <div className="text-center mb-4">
-            <h3 className="mb-0 fw-bold" style={{ color: '#333' }}>Login to Your Account</h3>
-            <p className="text-muted">Enter your credentials to access Taskly</p>
+            <h3 className={styles.heading}>
+              {isSignup ? 'Create Account' : 'Login'}
+            </h3>
+            <p className={styles.subText}>
+              {isSignup
+                ? 'Start your journey with Taskly'
+                : 'Login to manage your tasks'}
+            </p>
           </div>
-          {error && <div className="alert alert-danger text-center">{error}</div>}
-          <form onSubmit={handleLogin}>
+
+          {error && (
+            <div className="alert alert-danger text-center">{error}</div>
+          )}
+
+          <form
+            onSubmit={isSignup ? handleSignup : handleLogin}
+            className={styles.form}
+          >
+            {isSignup && (
+              <div className="mb-3">
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder='Username'
+                  required
+                />
+              </div>
+            )}
+
             <div className="mb-3">
-              <label className="form-label text-muted">Email address</label>
               <input
                 type="email"
-                className="form-control"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder='Email'
                 required
-                autoFocus
               />
             </div>
-            <div className="mb-4">
-              <label className="form-label text-muted">Password</label>
+
+            <div className="mb-3">
               <input
                 type="password"
-                className="form-control"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder='Password'
                 required
               />
             </div>
-            <button type="submit" onClick={handleLogin} className="btn w-100 py-2 fw-bold text-white btn-primary-taskly" style={{ backgroundColor: '#4d46e1', border: 'none', borderRadius: '8px' }}>
-              Login
-            </button>
+
+            {isSignup && (
+              <div className="mb-3">
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onKeyUp={handleConfirmPasswordKeyUp}
+                  className={
+                    confirmPassword
+                      ? isPasswordMatch
+                        ? styles.match
+                        : styles.mismatch
+                      : ''
+                  }
+                  placeholder='Confirm Password'
+                  required
+                />
+              </div>
+            )}
+
+            <AddButton
+              type="submit"
+              label={isSignup ? 'Sign Up' : 'Login'}
+              className="btn w-100 py-2 fw-bold"
+              style={{
+                backgroundColor: '#4d46e1',
+                borderRadius: '8px',
+                color: 'white',
+              }}
+            />
+
             <div className="text-center mt-3">
-              <a href="#" className="text-decoration-none" style={{ color: '#4d46e1' }}>Forgot Password?</a>
+              <span
+                onClick={() => setIsSignup(!isSignup)}
+                className={styles.toggleLink}
+              >
+                {isSignup
+                  ? 'Already have an account? Login'
+                  : 'Create a new account'}
+              </span>
             </div>
+
+            {!isSignup && (
+              <div className="text-center mt-2">
+                <a
+                  href="#"
+                  className={styles.toggleLink}
+                  onClick={(e) => e.preventDefault()}
+                >
+                  Forgot Password?
+                </a>
+              </div>
+            )}
           </form>
         </div>
       </div>

@@ -61,7 +61,7 @@ const MainContent = ({ tasks, onDelete, onEdit, onDone, onToggleFavorite, active
       </div>
 
       {/* Filter Sidebar */}
-      <div className="col-md-3 d-flex justify-content-center" style={{ height: '270px', marginTop: '55px', overflowY: 'auto' }}>
+      <div className="col-md-3 d-flex justify-content-center" style={{ height: '235px', marginTop: '55px', overflowY: 'auto' }}>
         <TaskFilterCard
           activeFilter={activeFilter}     // <-- Pass activeFilter to TaskFilterCard
           onFilterChange={onFilterChange} // <-- Pass onFilterChange to TaskFilterCard

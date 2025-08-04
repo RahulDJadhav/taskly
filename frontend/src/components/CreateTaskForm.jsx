@@ -47,7 +47,10 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
     openModal: (task = null) => {
       const modal = new window.bootstrap.Modal(modalRef.current);
       modalInstanceRef.current = modal;
-
+      const safeParseDate = (dateStr) => {
+        const parsed = new Date(dateStr);
+        return isNaN(parsed.getTime()) ? null : parsed;
+      };
       if (task) {
         // Wait until dropdowns are loaded before setting task values
         const waitAndSetForm = () => {
@@ -56,17 +59,17 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
             setTaskTitle(task.title || '');
             setStartDate(
               task.startDate
-                ? task.startDate.substring(0, 10)
+                ? safeParseDate(task.startDate)
                 : task.start_date
-                  ? task.start_date.substring(0, 10)
-                  : ''
+                  ? safeParseDate(task.start_date)
+                  : null
             );
             setDueDate(
               task.dueDate
-                ? task.dueDate.substring(0, 10)
+                ? safeParseDate(task.dueDate)
                 : task.due_date
-                  ? task.due_date.substring(0, 10)
-                  : ''
+                  ? safeParseDate(task.due_date)
+                  : null
             );
             setDescription(task.description || '');
             setPriority(task.priority || '');

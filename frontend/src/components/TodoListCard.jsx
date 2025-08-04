@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './TodoListCard.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar as farStar, faHeart as farHeart } from '@fortawesome/free-regular-svg-icons';
-import { faEllipsisH, faSquare } from '@fortawesome/free-solid-svg-icons';
-// import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
-// import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
 import { faStar as solidStar, faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
 import { faStar as regularStar, faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
 import TaskOptions from './TaskOptions';
@@ -34,34 +30,36 @@ const TodoListCard = ({ data, onEdit, onDelete, onDone, onToggleFavorite, onTogg
               <input
                 className={`form-check-input me-2 ${styles.checkbox}`}
                 type="checkbox"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title={task.is_done ? "Mark as Open" : "Mark as Done"}
                 id={`check-${task.id}`}
                 checked={!!task.is_done}
                 onChange={() => onDone && onDone(task.id, task.is_done)}
               />
-              {/* {console.log(`Task ID: ${task.id}, is_done: ${task.is_done}, checked: ${!!task.is_done}`)} */}
               <FontAwesomeIcon
                 icon={task.is_important ? solidStar : regularStar}
                 style={{ color: task.is_important ? 'gold' : '#6c757d', cursor: 'pointer' }}
                 onClick={() => onToggleImportant && onToggleImportant(task.id, task.is_important)}
-                className="me-2" // Added margin-end here
+                className="me-2"
               />
               <FontAwesomeIcon
                 icon={task.is_favorite ? solidHeart : regularHeart}
                 style={{ color: task.is_favorite ? 'red' : '#6c757d', cursor: 'pointer' }}
                 onClick={() => onToggleFavorite && onToggleFavorite(task.id, task.is_favorite)}
-                className="me-2" // Added margin-end here
+                className="me-2"
               />
             </div>
           </div>
           <div className="col-md-10 d-flex align-items-center">
             <div className="col-md-3">
-              <span className="fw-semibold"><TaskTextToggle text={task.title} maxLength={25} /></span> {/* Increased maxLength for title */}
+              <span className="fw-semibold"><TaskTextToggle text={task.title} maxLength={20} /></span>
             </div>
             <div className="col-md-2">
-              <span className="text-muted small">{task.due_date}</span> {/* Changed to task.due_date */}
+              <span className="text-muted small">{task.due_date}</span>
             </div>
             <div className="col-md-4">
-              <span className="text-muted small"><TaskTextToggle text={task.description} maxLength={40} /></span> {/* Increased maxLength for description */}
+              <span className="text-muted small"><TaskTextToggle text={task.description} maxLength={20} /></span>
             </div>
             <div className="col-md-1 text-center">
               <span className={`badge 
