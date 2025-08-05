@@ -20,23 +20,287 @@
   cursor: pointer;
 }
 
+/* Profile Card Styles */
+.profileCard {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 5px;
+  text-align: center;
+  max-width: 250px;
+  margin: 20px auto;
+  position: relative;
+}
+
+.profilePicContainer {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 10px auto;
+  border: 3px solid #665df5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0;
+}
+
+.profilePic {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profilePicPlaceholder {
+  color: #888;
+  font-size: 0.9em;
+}
+
+.fileInput {
+  display: none;
+  /* Hidden as it's now purely a placeholder */
+}
+
+.profileInfo {
+  margin-bottom: 20px;
+}
+
+.name {
+  font-size: 1.6em;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.email {
+  font-size: 1em;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.editIcon {
+  color: #665df5;
+  cursor: pointer;
+  font-size: 1.2em;
+  transition: color 0.2s ease;
+}
+
+.editIcon:hover {
+  color: #4d46e1;
+}
+
+/* Modal Styles */
 .modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 9999;
+  align-items: center;
+  z-index: 1000;
 }
 
-.modalContent {
-  background: #fff;
-  padding: 2rem;
+.modalContainer {
+  /* Renamed from modalContent */
+  background-color: #fff;
+  padding: 30px;
   border-radius: 10px;
-  min-width: 300px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 500px;
+  animation: fadeIn 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 1.5em;
+  color: #333;
+}
+
+.closeButton {
+  cursor: pointer;
+  font-size: 1.5em;
+  color: #888;
+}
+
+.closeButton:hover {
+  color: #555;
+}
+
+/* Profile Edit Form inside Modal */
+.editProfileForm {
+  /* Renamed class */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* Spacing between form sections */
+}
+
+.formSection {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+  /* Subtle separator */
+}
+
+.formSection:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.formGroup {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #555;
+}
+
+.inputField {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  /* Slightly more rounded */
+  box-sizing: border-box;
+  font-size: 1em;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inputField:focus {
+  border-color: #665df5;
+  box-shadow: 0 0 0 3px rgba(102, 93, 245, 0.2);
+  outline: none;
+}
+
+.profilePicUploadArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.profilePicPreviewWrapper {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #e9e9e9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #ccc;
+  /* Dashed border for upload area */
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.profilePicPreviewWrapper:hover {
+  border-color: #665df5;
+}
+
+.profilePicPreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profilePicPlaceholderLarge {
+  color: #a0a0a0;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+.profilePicPlaceholderLarge svg {
+  font-size: 2em;
+  margin-bottom: 5px;
+}
+
+.uploadButton {
+  background-color: #665df5;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s ease;
+}
+
+.uploadButton:hover {
+  background-color: #4d46e1;
+}
+
+.hiddenFileInput {
+  display: none;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.cancelButton {
+  background-color: #e0e0e0;
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.2s ease;
+}
+
+.cancelButton:hover {
+  background-color: #ccc;
+}
+
+.primaryButton {
+  /* Renamed from saveButton */
+  background-color: #665df5;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.primaryButton:hover {
+  background-color: #4d46e1;
+  transform: translateY(-1px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

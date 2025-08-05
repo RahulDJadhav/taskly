@@ -27,46 +27,38 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
 
-  // Always get userId from localStorage for API calls
-  const getUserId = () => localStorage.getItem("userId");
-
-  // useEffect(() => {
-  //   const userId = localStorage.getItem("userId"); 
-
-  //   if (!userId) {
-  //     console.error("User ID not found in localStorage");
-  //     return;
-  //   }
-  //   fetch(`${API_BASE}getTasks.php?user_id=${userId}`)
-  //     .then(response => response.json())
-  //     .then(data => setTasks(data));
-  // }, []);
+  // Fetch tasks for the logged-in user
   useEffect(() => {
-    const userId = getUserId();
-    if (!userId) {
-      console.error("User ID not found in localStorage");
-      setTasks([]);
-      return;
-    }
-    fetch(`${API_BASE}getTasks.php?user_id=${userId}`)
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setTasks(data);
-        } else {
-          console.error("Expected array but got:", data);
+    const userId = localStorage.getItem("userId");
+
+    if (userId) {
+      fetch(`${API_BASE}getTasks.php?user_id=${userId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            setTasks(data);
+          } else {
+            console.error("Expected array but got:", data);
+            setTasks([]);
+          }
+        })
+        .catch(error => {
+          console.error("Fetch failed:", error);
           setTasks([]);
-        }
-      })
-      .catch(() => setTasks([]));
-  }, []);
-
-  // const handleLogin = () => {
-  //   setIsLoggedIn(true);
-
+        });
+    } else {
+      // If no user is logged in, clear tasks
+      setTasks([]);
+    }
+  }, [isLoggedIn]); // Re-fetch when login status changes
 
   const handleAddTask = (newTask) => {
-    const userId = getUserId();
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("Please log in to add tasks.");
+      return;
+    }
+
     const taskWithDefaults = {
       ...newTask,
       due_date: newTask.dueDate, // Ensure snake_case for backend
@@ -85,17 +77,20 @@ const App = () => {
       .then(data => {
         if (data.message && data.message.includes("successfully")) {
           // Re-fetch tasks only on success
-          fetch(`${API_BASE}getTasks.php?user_id=${userId}`)
+          const currentUserId = localStorage.getItem("userId");
+          fetch(`${API_BASE}getTasks.php?user_id=${currentUserId}`)
             .then(res => res.json())
             .then(data => {
               setTasks(data);
               setSuccessMessage("Task Created Successfully!");
               setTimeout(() => setSuccessMessage(""), 1000);
             });
+        } else if (data.error) {
+          console.error("Server Error:", data.error);
+          alert(`Error: ${data.error}`);
         } else {
-          // Server returned an error message
-          console.error("Server Error:", data.message);
-          alert(`Error: ${data.message}`);
+          console.error("Server Error:", data.message || JSON.stringify(data));
+          alert(`Error: ${data.message || JSON.stringify(data)}`);
         }
       })
       .catch(error => {
@@ -106,7 +101,11 @@ const App = () => {
 
   // UPDATE
   const handleUpdateTask = async (updatedTask) => {
-    const userId = getUserId();
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("Please log in to update tasks.");
+      return;
+    }
     try {
       const res = await fetch(`${API_BASE}updateTask.php`, {
         method: 'POST',
@@ -124,7 +123,8 @@ const App = () => {
 
       if (result.message && result.message.toLowerCase().includes("success")) {
         // Refresh task list
-        const taskRes = await fetch(`${API_BASE}getTasks.php?user_id=${userId}`);
+        const currentUserId = localStorage.getItem("userId");
+        const taskRes = await fetch(`${API_BASE}getTasks.php?user_id=${currentUserId}`);
         const data = await taskRes.json();
         setTasks(data);
         setSuccessMessage("Task updated successfully!");
@@ -141,23 +141,30 @@ const App = () => {
 
   // DELETE
   const handleDeleteTask = async (id) => {
-    const userId = getUserId();
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("Please log in to delete tasks.");
+      return;
+    }
+
     const confirmDelete = window.confirm("Are you sure you want to delete this task?");
     if (!confirmDelete) return;
+
     try {
       const res = await fetch(`${API_BASE}deleteTask.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id, user_id: userId }) // Always include user_id
+        body: JSON.stringify({ id, user_id: userId }), // Always include user_id
       });
 
       const result = await res.json();
 
       if (result.message && result.message.toLowerCase().includes("success")) {
         // Refresh the task list
-        const taskRes = await fetch(`${API_BASE}getTasks.php?user_id=${userId}`);
+        const currentUserId = localStorage.getItem("userId");
+        const taskRes = await fetch(`${API_BASE}getTasks.php?user_id=${currentUserId}`);
         const data = await taskRes.json();
         setTasks(data);
         setSuccessMessage("Task deleted successfully!");
@@ -186,7 +193,12 @@ const App = () => {
 
   //Done
   const handleDoneTask = async (id, isCurrentlyDone) => {
-    const userId = getUserId();
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("Please log in to update task status.");
+      return;
+    }
+
     const newDoneStatus = Number(isCurrentlyDone) === 1 ? 0 : 1;
     const newStatus = newDoneStatus === 1 ? 'Completed' : 'Open';
 
@@ -208,7 +220,8 @@ const App = () => {
       const result = await res.json();
 
       if (result.message && result.message.toLowerCase().includes("updated")) {
-        const taskRes = await fetch(`${API_BASE}getTasks.php?user_id=${userId}`);
+        const currentUserId = localStorage.getItem("userId");
+        const taskRes = await fetch(`${API_BASE}getTasks.php?user_id=${currentUserId}`);
         const data = await taskRes.json();
         setTasks(data);
 
@@ -229,9 +242,17 @@ const App = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userEmail");
   };
   const handleToggleImportant = async (id, isCurrentlyImportant) => {
-    const userId = getUserId();
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("Please log in to update task importance.");
+      return;
+    }
+
     const newImportantStatus = isCurrentlyImportant ? 0 : 1;
     try {
       const res = await fetch(`${API_BASE}toggleImportant.php`, {
@@ -242,7 +263,8 @@ const App = () => {
       const result = await res.json();
       if (res.ok && result.message === 'Important status updated') {
         // Re-fetch tasks to update UI
-        const taskRes = await fetch(`${API_BASE}getTasks.php?user_id=${userId}`);
+        const currentUserId = localStorage.getItem("userId");
+        const taskRes = await fetch(`${API_BASE}getTasks.php?user_id=${currentUserId}`);
         const data = await taskRes.json();
         setTasks(data);
       }
@@ -257,7 +279,12 @@ const App = () => {
   };
 
   const handleToggleFavorite = async (id, isCurrentlyFavorite) => {
-    const userId = getUserId();
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("Please log in to update task favorite status.");
+      return;
+    }
+
     const newFavoriteStatus = isCurrentlyFavorite ? 0 : 1;
     try {
       const res = await fetch(`${API_BASE}toggleFavorite.php`, {
@@ -268,7 +295,8 @@ const App = () => {
       const result = await res.json();
       if (res.ok && result.message === 'Favorite status updated') {
         // Re-fetch tasks to update UI
-        const taskRes = await fetch(`${API_BASE}getTasks.php?user_id=${userId}`);
+        const currentUserId = localStorage.getItem("userId");
+        const taskRes = await fetch(`${API_BASE}getTasks.php?user_id=${currentUserId}`);
         const data = await taskRes.json();
         setTasks(data);
       }
@@ -307,6 +335,23 @@ const App = () => {
 
   // Purpose: If the user is not logged in, show the login page.
   // After login: The main app is rendered.
+  useEffect(() => {
+    const checkLoggedIn = () => {
+      if (localStorage.getItem("userId")) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+    };
+    checkLoggedIn();
+
+    // Listen for storage changes from other tabs/windows if needed
+    window.addEventListener('storage', checkLoggedIn);
+    return () => {
+      window.removeEventListener('storage', checkLoggedIn);
+    };
+  }, []);
+
   if (!isLoggedIn) {
     return <Login onLogin={() => setIsLoggedIn(true)} />;
   }

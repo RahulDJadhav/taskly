@@ -5,17 +5,16 @@ import { faEdit } from '@fortawesome/free-solid-svg-icons';
 
 export default function Profile() {
   // Load from localStorage or use defaults
-  const [name, setName] = useState(() => localStorage.getItem('profileName') || 'Rahul Jadhav');
-  // const [designation, setDesignation] = useState(() => localStorage.getItem('profileDesignation') || 'Developer');
-  const [email, setEmailAddress] = useState(() => localStorage.getItem('emailAddress') || 'admin@xts.com');
+  const [name, setName] = useState(() => localStorage.getItem('userName') || 'Rahul Jadhav');
+  const [email, setEmailAddress] = useState(() => localStorage.getItem('userEmail') || 'admin@xts.com');
   const [profilePic, setProfilePic] = useState(() => localStorage.getItem('profilePic') || '');
   const [showForm, setShowForm] = useState(false);
+  const [isSaving, setIsSaving] = useState(false); // New state for loading indicator
 
   // Save to localStorage on change
   useEffect(() => {
-    localStorage.setItem('profileName', name);
-    // localStorage.setItem('profileDesignation', designation);
-    localStorage.setItem('emailAddress', email);
+    localStorage.setItem('userName', name); // Corrected key
+    localStorage.setItem('userEmail', email); // Corrected key
     localStorage.setItem('profilePic', profilePic);
   }, [name, email, profilePic]);
 
@@ -30,58 +29,97 @@ export default function Profile() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setShowForm(false);
+    setIsSaving(true); // Set saving to true when form is submitted
+    const userId = localStorage.getItem('userId'); // Get user ID from localStorage
+
+    if (!userId) {
+      console.error("User ID not found in localStorage.");
+      setIsSaving(false); // Reset saving state
+      return;
+    }
+
+    // Prepare data to send to backend
+    const formData = new FormData();
+    formData.append('id', userId);
+    formData.append('name', name);
+    // Optionally, handle profile picture if a new one is selected
+    // if (newFile) { // Assuming 'newFile' state would exist if we had a modal
+    //   formData.append('profilePic', newFile);
+    // }
+
+    fetch('http://localhost/taskly/backend/update_profile.php', {
+      method: 'POST',
+      body: formData,
+      // Do not set Content-Type for FormData; browser sets it automatically
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log("Profile updated successfully:", data.message);
+          // Update localStorage with new name
+          localStorage.setItem('userName', name);
+          // Optionally, show a temporary success message to the user
+        } else {
+          console.error("Error updating profile:", data.message);
+          // Optionally, show a temporary error message to the user
+        }
+      })
+      .catch(error => {
+        console.error("Fetch error:", error);
+        // Optionally, show a temporary error message to the user
+      })
+      .finally(() => {
+        setIsSaving(false); // Reset saving to false after fetch completes
+        setShowForm(false); // Ensure form closes after operation
+      });
   };
 
   return (
-    <div>
-      <div className={`d-flex align-items-center justify-content-between ${styles.profile}`}>
-        <div className="d-flex align-items-center">
-          <img
-            src={profilePic || " "}
-            alt="Profile"
-            className={`img-fluid rounded-circle me-3 ${styles.profileImage}`}
-            style={{ width: 50, height: 50, objectFit: 'cover' }}
-          />
-          <div>
-            <span className={`fw-semibold ${styles.profileName}`}>{name}</span>
-            {/* <p className="text-muted mb-0 small">{designation}</p> */}
-          </div>
-
-        </div>
-        <FontAwesomeIcon icon={faEdit} className={`text-primary ${styles.profileEdit}`} onClick={() => setShowForm(true)} />
+    <div className={styles.profileCard}>
+      <div className={styles.profilePicContainer}>
+        {profilePic ? (
+          <img src={profilePic} alt="Profile" className={styles.profilePic} />
+        ) : (
+          <div className={styles.profilePicPlaceholder}>No Image</div>
+        )}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handlePicChange}
+          className={styles.fileInput}
+        />
       </div>
-
-      {/* Modal for editing profile */}
-      {showForm && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h5>Edit Profile</h5>
-            <hr />
-            <form onSubmit={handleSubmit}>
-              <div className="mb-2">
-                <label className="form-label">Name</label>
-                <input className="form-control" value={name} onChange={e => setName(e.target.value)} required />
-              </div>
-              {/* <div className="mb-2">
-                <label className="form-label">Designation</label>
-                <input className="form-control" value={designation} onChange={e => setDesignation(e.target.value)} required />
-              </div> */}
-              <div className="mb-2">
-                <label className="form-label">Email</label>
-                <input className="form-control" value={email} onChange={e => setEmailAddress(e.target.value)} required />
-              </div>
-              <div className="mb-2">
-                <label className="form-label">Profile Picture</label>
-                <input className="form-control" type="file" accept="image/*" onChange={handlePicChange} />
-              </div>
-              <div className="d-flex justify-content-end">
-                <button type="button" className="btn btn-secondary me-2" onClick={() => setShowForm(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Save</button>
-              </div>
-            </form>
-          </div>
+      {!showForm ? (
+        <div className={styles.profileInfo}>
+          <p className={styles.name}>{name}</p>
+          <p className={styles.email}>{email}</p>
+          <FontAwesomeIcon
+            icon={faEdit}
+            className={styles.editIcon}
+            onClick={() => setShowForm(true)}
+          />
         </div>
+      ) : (
+        <form onSubmit={handleSubmit} className={styles.editForm}>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Name"
+            className={styles.inputField}
+          />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmailAddress(e.target.value)}
+            placeholder="Email"
+            className={styles.inputField}
+            disabled // Disable the email field
+          />
+          <button type="submit" className={styles.primaryButton} disabled={isSaving}>
+            {isSaving ? 'Saving...' : 'Save'}
+          </button>
+        </form>
       )}
     </div>
   );

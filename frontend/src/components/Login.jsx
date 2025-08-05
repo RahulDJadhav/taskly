@@ -52,26 +52,20 @@ const Login = ({ onLogin }) => {
 
     if (password !== confirmPassword) {
       setIsPasswordMatch(false);
-      setError('Passwords do not match');
+      setError('Passwords do not match!');
       return;
-    } else {
-      setIsPasswordMatch(true);
     }
 
     fetch(`${API_BASE}signupUser.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password, confirmPassword }),
+      body: JSON.stringify({ name, email, password }),
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          alert('Signup successful. Please log in.');
-          setIsSignup(false);
-          setEmail('');
-          setPassword('');
-          setConfirmPassword('');
-          setName('');
+          alert(data.message);
+          setIsSignup(false); // Switch to login form after successful signup
           setError('');
         } else {
           setError(data.message || 'Signup failed');
@@ -80,15 +74,9 @@ const Login = ({ onLogin }) => {
       .catch(() => setError('Something went wrong.'));
   };
 
-  const handleConfirmPasswordKeyUp = (e) => {
-    const value = e.target.value;
-    setConfirmPassword(value);
-    setIsPasswordMatch(value === password);
-  };
-
   return (
-    <div className={styles.container}>
-      <div className={styles.leftPanel}>
+    <div className={styles.container}> {/* Using a main container style */}
+      <div className={styles.leftPanel}> {/* Left panel for branding/info */}
         <div className="text-center">
           <img
             src="/xts_white.png"
@@ -100,8 +88,8 @@ const Login = ({ onLogin }) => {
         </div>
       </div>
 
-      <div className={styles.rightPanel}>
-        <div className={styles.card}>
+      <div className={styles.rightPanel}> {/* Right panel for login/signup form */}
+        <div className={styles.card}> {/* Card for the form */}
           <div className="text-center mb-4">
             <h3 className={styles.heading}>
               {isSignup ? 'Create Account' : 'Login'}
@@ -129,6 +117,7 @@ const Login = ({ onLogin }) => {
                   onChange={(e) => setName(e.target.value)}
                   placeholder='Username'
                   required
+                  className="form-control"
                 />
               </div>
             )}
@@ -140,6 +129,7 @@ const Login = ({ onLogin }) => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder='Email'
                 required
+                className="form-control"
               />
             </div>
 
@@ -150,6 +140,7 @@ const Login = ({ onLogin }) => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder='Password'
                 required
+                className="form-control"
               />
             </div>
 
@@ -159,23 +150,23 @@ const Login = ({ onLogin }) => {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  onKeyUp={handleConfirmPasswordKeyUp}
                   className={
                     confirmPassword
                       ? isPasswordMatch
                         ? styles.match
                         : styles.mismatch
-                      : ''
+                      : 'form-control'
                   }
                   placeholder='Confirm Password'
                   required
                 />
+                {!isPasswordMatch && <p className={styles.error}>Passwords do not match!</p>}
               </div>
             )}
 
             <AddButton
               type="submit"
-              label={isSignup ? 'Sign Up' : 'Login'}
+              text={isSignup ? 'Sign Up' : 'Login'}
               className="btn w-100 py-2 fw-bold"
               style={{
                 backgroundColor: '#4d46e1',
@@ -186,7 +177,15 @@ const Login = ({ onLogin }) => {
 
             <div className="text-center mt-3">
               <span
-                onClick={() => setIsSignup(!isSignup)}
+                onClick={() => {
+                  setIsSignup(!isSignup);
+                  setError(''); // Clear errors when toggling form
+                  setIsPasswordMatch(true);
+                  setName(''); // Clear form fields on toggle
+                  setEmail('');
+                  setPassword('');
+                  setConfirmPassword('');
+                }}
                 className={styles.toggleLink}
               >
                 {isSignup
