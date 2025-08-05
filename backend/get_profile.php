@@ -1,46 +1,26 @@
 <?php
-// Prevent any HTML or whitespace from breaking the JSON output
-ob_start();
 
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: GET");
 header("Content-Type: application/json");
 
-// Database connection
-$conn = new mysqli("localhost", "root", "", "taskly");
-if ($conn->connect_error) {
-    ob_end_clean();
-    echo json_encode(["success" => false, "message" => "DB connection failed"]);
-    exit;
-}
+include 'db.php';
 
-// Get email from query
-$email = $_GET['email'] ?? '';
-if (!$email) {
-    ob_end_clean();
-    echo json_encode(["success" => false, "message" => "No email provided"]);
-    exit;
-}
+// Get data from query (if applicable)
+$user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : null; // Get user_id if needed
 
-// Prepare and execute query
-$stmt = $conn->prepare("SELECT name, email, profile_pic FROM users WHERE email = ?");
-$stmt->bind_param("s", $email);
+// Assuming a generic profile fetch or based on a default user/first user
+$stmt = $conn->prepare("SELECT id, name, email, role FROM users LIMIT 1"); // Fetch first user as example
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Handle result
-if ($result->num_rows === 1) {
-    $row = $result->fetch_assoc();
-    ob_end_clean(); // clear buffer before sending response
-    echo json_encode([
-        "success" => true,
-        "name" => $row['name'],
-        "email" => $row['email'],
-        "profile_pic" => $row['profile_pic']
-    ]);
-} else {
-    ob_end_clean();
-    echo json_encode(["success" => false, "message" => "User not found"]);
+$profile = null;
+if ($row = $result->fetch_assoc()) {
+    $profile = $row;
 }
 
-$stmt->close();
+echo json_encode($profile);
+
 $conn->close();
+?>

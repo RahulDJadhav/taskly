@@ -1,20 +1,12 @@
 <?php
-session_start();
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+error_reporting(E_ALL);
+ini_set('error_log', __DIR__ . '/debug.log');
 
-// STEP 1: Handle preflight CORS request
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header("Access-Control-Allow-Origin: http://localhost:3000");
-    header("Access-Control-Allow-Credentials: true");
-    header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
-    header("Access-Control-Allow-Headers: Content-Type");
-    header("Content-Type: application/json");
-    exit(0);
-}
-header("Access-Control-Allow-Origin: http://localhost:3000");
-header("Access-Control-Allow-Credentials: true");
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
-header("Content-Type: application/json");
+header("Access-Control-Allow-Methods: POST");
 
 $conn = new mysqli("localhost", "root", "", "taskly");
 
@@ -26,22 +18,17 @@ $data = json_decode(file_get_contents("php://input"));
 
 if (
     isset($data->id) && isset($data->title) && isset($data->startDate) && isset($data->dueDate) &&
-    isset($data->description) && isset($data->priority) 
-    // &&
-    // isset($data->status) && isset($data->assignee)
+    isset($data->description) && isset($data->priority) &&
+    isset($data->user_id) // Expect user_id from frontend
 ) {
-    $user_id = isset($data->user_id) ? intval($data->user_id) : 0;
-if (!$user_id) {
-    echo json_encode(['error' => 'Not authenticated']);
-    exit;
-}
+    $id = (int)$data->id;
+    $user_id = intval($data->user_id); // Get user_id from request body
     $title = $conn->real_escape_string($data->title);
     $startDate = $conn->real_escape_string($data->startDate);
     $dueDate = $conn->real_escape_string($data->dueDate);
     $description = $conn->real_escape_string($data->description);
     $priority = $conn->real_escape_string($data->priority);
     $status = $conn->real_escape_string($data->status);
-    // $assignee = $conn->real_escape_string($data->assignee);
 
     $sql = "UPDATE todotasks SET 
               title='$title', 
@@ -50,7 +37,6 @@ if (!$user_id) {
               description='$description', 
               priority='$priority', 
               status='$status'
-            --   assignee='$assignee' 
             WHERE id=$id AND user_id=$user_id";
 
     if ($conn->query($sql)) {

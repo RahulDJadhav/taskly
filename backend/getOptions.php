@@ -1,41 +1,33 @@
 <?php
+
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET");
+header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
 
-// Connect to DB
-$conn = new mysqli("localhost", "root", "", "taskly");
+include 'db.php';
 
-if ($conn->connect_error) {
-    echo json_encode(["error" => "Database connection failed"]);
-    exit;
-}
+$options = [
+    "priorities" => [
+        ["name" => "Low", "value" => "Low"],
+        ["name" => "Medium", "value" => "Medium"],
+        ["name" => "High", "value" => "High"],
+        ["name" => "Urgent", "value" => "Urgent"]
+    ],
+    "statuses" => [
+        ["name" => "Open", "value" => "Open"],
+        ["name" => "In Progress", "value" => "In Progress"],
+        ["name" => "On Hold", "value" => "On Hold"],
+        ["name" => "Cancelled", "value" => "Cancelled"],
+        ["name" => "Completed", "value" => "Completed"]
+    ],
+    "assignees" => [
+        ["id" => 1, "name" => "Admin"], // Example, fetch from users table if real
+        ["id" => 2, "name" => "User1"]
+    ]
+];
 
-// Fetch priorities
-$priorities = [];
-$result = $conn->query("SELECT id, name FROM priorities");
-while ($row = $result->fetch_assoc()) {
-    $priorities[] = $row;
-}
-
-// Fetch statuses
-$statuses = [];
-$result = $conn->query("SELECT id, name FROM statuses");
-while ($row = $result->fetch_assoc()) {
-    $statuses[] = $row;
-}
-
-// Fetch users (assignees)
-$users = [];
-$result = $conn->query("SELECT id, name FROM users");
-while ($row = $result->fetch_assoc()) {
-    $users[] = $row;
-}
-
-echo json_encode([
-    "priorities" => $priorities,
-    "statuses" => $statuses,
-    "users" => $users
-]);
+echo json_encode($options);
 
 $conn->close();
 ?>
