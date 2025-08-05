@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTasks } from '@fortawesome/free-solid-svg-icons';
+import { faTasks, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import AddButton from './AddButton';
 import styles from './Login.module.css';
 
@@ -14,6 +14,8 @@ const Login = ({ onLogin }) => {
   const [isPasswordMatch, setIsPasswordMatch] = useState(true);
   const [error, setError] = useState('');
   const [isSignup, setIsSignup] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -133,7 +135,7 @@ const Login = ({ onLogin }) => {
               />
             </div>
 
-            <div className="mb-3">
+            {/* <div className="mb-3">
               <input
                 type="password"
                 value={password}
@@ -142,9 +144,31 @@ const Login = ({ onLogin }) => {
                 required
                 className="form-control"
               />
+            </div> */}
+            <div className="mb-3" style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                required
+                className="form-control"
+              />
+              <FontAwesomeIcon
+                icon={showPassword ? faEyeSlash : faEye}
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: 10,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  cursor: 'pointer',
+                  color: '#888',
+                }}
+              />
             </div>
 
-            {isSignup && (
+            {/* {isSignup && (
               <div className="mb-3">
                 <input
                   type="password"
@@ -162,7 +186,39 @@ const Login = ({ onLogin }) => {
                 />
                 {!isPasswordMatch && <p className={styles.error}>Passwords do not match!</p>}
               </div>
+            )} */}
+            {isSignup && (
+              <div className="mb-3" style={{ position: 'relative' }}>
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className={
+                    confirmPassword
+                      ? isPasswordMatch
+                        ? styles.match
+                        : styles.mismatch
+                      : 'form-control'
+                  }
+                  placeholder="Confirm Password"
+                  required
+                />
+                <FontAwesomeIcon
+                  icon={showConfirmPassword ? faEyeSlash : faEye}
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: 10,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer',
+                    color: '#888',
+                  }}
+                />
+                {!isPasswordMatch && <p className={styles.error}>Passwords do not match!</p>}
+              </div>
             )}
+
 
             <AddButton
               type="submit"
