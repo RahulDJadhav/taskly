@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import CreateTaskForm from './components/CreateTaskForm';
 import './App.css';
 import Login from './components/Login';
+import AdminPanel from './components/AdminPanel';
 
 
 const App = () => {
@@ -26,6 +27,9 @@ const App = () => {
   // isLoggedIn: Tracks if the user is logged in.
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
+
+  const [showAdmin, setShowAdmin] = useState(false);
+  const isAdmin = localStorage.getItem('userRole') === 'admin';
 
   // Fetch tasks for the logged-in user
   useEffect(() => {
@@ -358,7 +362,7 @@ const App = () => {
   return (
     <div className="d-flex flex-column body" style={{ minHeight: '100vh' }}>
       {/* Header */}
-      <Header onAddClick={handleOpenCreate} onLogout={handleLogout} />
+      <Header onAddClick={handleOpenCreate} onLogout={handleLogout} tasks={tasks} onOpenAdmin={() => setShowAdmin(true)} />
 
       {/* Body: Sidebar + Content */}
       <div className="d-flex flex-grow-1">
@@ -377,17 +381,21 @@ const App = () => {
                 </div>
 
               )}
-              <MainContent
-                tasks={tasks}
-                onDelete={handleDeleteTask}
-                onEdit={handleEditTask}
-                onDone={handleDoneTask}
-                onToggleFavorite={handleToggleFavorite}
-                onToggleImportant={handleToggleImportant}
-                activeFilter={activeFilter}
-                onFilterChange={handleFilterChange}
-                taskCounts={taskCounts}
-              />
+              {isAdmin && showAdmin ? (
+                <AdminPanel onClose={() => setShowAdmin(false)} />
+              ) : (
+                <MainContent
+                  tasks={tasks}
+                  onDelete={handleDeleteTask}
+                  onEdit={handleEditTask}
+                  onDone={handleDoneTask}
+                  onToggleFavorite={handleToggleFavorite}
+                  onToggleImportant={handleToggleImportant}
+                  activeFilter={activeFilter}
+                  onFilterChange={handleFilterChange}
+                  taskCounts={taskCounts}
+                />
+              )}
             </div>
           </div>
         </div>

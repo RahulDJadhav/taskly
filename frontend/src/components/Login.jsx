@@ -37,6 +37,7 @@ const Login = ({ onLogin }) => {
           localStorage.setItem("userId", data.user.id);
           localStorage.setItem("userName", data.user.name);
           localStorage.setItem("userEmail", data.user.email);
+          localStorage.setItem("userRole", data.user.role);
           onLogin();
         } else {
           setError(data.message || 'Login failed');
