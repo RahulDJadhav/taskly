@@ -1,124 +1,163 @@
-import React, { useState, useEffect } from 'react';
-import styles from './Profile.module.css';
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import styles from "./Profile.module.css";
+
+const API_BASE = "http://localhost/taskly/taskly/backend/";
 
 export default function Profile() {
-  // Load from localStorage or use defaults
-  const [name, setName] = useState(() => localStorage.getItem('userName') || 'Rahul Jadhav');
-  const [email, setEmailAddress] = useState(() => localStorage.getItem('userEmail') || 'admin@xts.com');
-  const [profilePic, setProfilePic] = useState(() => localStorage.getItem('profilePic') || '');
-  const [showForm, setShowForm] = useState(false);
-  const [isSaving, setIsSaving] = useState(false); // New state for loading indicator
+  const [user, setUser] = useState({ id: "", name: "", email: "", profilePic: "" });
+  const [newName, setNewName] = useState("");
+  const [newFile, setNewFile] = useState(null);
+  const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState(null);
+  const [msgType, setMsgType] = useState("success"); // "success" | "error"
 
-  // Save to localStorage on change
   useEffect(() => {
-    localStorage.setItem('userName', name); // Corrected key
-    localStorage.setItem('userEmail', email); // Corrected key
-    localStorage.setItem('profilePic', profilePic);
-  }, [name, email, profilePic]);
+    const id = localStorage.getItem("userId");
+    const name = localStorage.getItem("userName");
+    const email = localStorage.getItem("userEmail");
+    const profilePic = localStorage.getItem("profilePic");
+    if (id && name && email) {
+      setUser({ id, name, email, profilePic: profilePic || "" });
+    }
+  }, []);
+
+  // Auto-hide messages after 3 seconds
+  useEffect(() => {
+    if (msg) {
+      const timer = setTimeout(() => setMsg(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [msg]);
 
   const handlePicChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setProfilePic(reader.result);
-      reader.readAsDataURL(file);
-    }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setNewFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => setUser({ ...user, profilePic: reader.result });
+    reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    setIsSaving(true); // Set saving to true when form is submitted
-    const userId = localStorage.getItem('userId'); // Get user ID from localStorage
-
-    if (!userId) {
-      console.error("User ID not found in localStorage.");
-      setIsSaving(false); // Reset saving state
+    if (!user.id) {
+      setMsgType("error");
+      setMsg("No user ID found.");
       return;
     }
+    setLoading(true);
+    setMsg(null);
 
-    // Prepare data to send to backend
     const formData = new FormData();
-    formData.append('id', userId);
-    formData.append('name', name);
-    // Optionally, handle profile picture if a new one is selected
-    // if (newFile) { // Assuming 'newFile' state would exist if we had a modal
-    //   formData.append('profilePic', newFile);
-    // }
+    formData.append("id", user.id);
+    formData.append("name", newName || user.name);
+    if (newFile) formData.append("profilePic", newFile);
 
-    fetch('http://localhost/taskly/backend/update_profile.php', {
-      method: 'POST',
-      body: formData,
-      // Do not set Content-Type for FormData; browser sets it automatically
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          console.log("Profile updated successfully:", data.message);
-          // Update localStorage with new name
-          localStorage.setItem('userName', name);
-          // Optionally, show a temporary success message to the user
-        } else {
-          console.error("Error updating profile:", data.message);
-          // Optionally, show a temporary error message to the user
-        }
-      })
-      .catch(error => {
-        console.error("Fetch error:", error);
-        // Optionally, show a temporary error message to the user
-      })
-      .finally(() => {
-        setIsSaving(false); // Reset saving to false after fetch completes
-        setShowForm(false); // Ensure form closes after operation
-      });
+    try {
+      const res = await fetch(`${API_BASE}update_profile.php`, { method: "POST", body: formData });
+      const data = await res.json();
+
+      if (data.success) {
+        const updated = {
+          ...user,
+          name: newName || user.name,
+          profilePic: data.profilePicUrl || user.profilePic,
+        };
+        setUser(updated);
+        localStorage.setItem("userName", updated.name);
+        if (updated.profilePic) localStorage.setItem("profilePic", updated.profilePic);
+
+        setMsgType("success");
+        setMsg("Profile updated successfully ✅");
+        setEditing(false);
+      } else {
+        setMsgType("error");
+        setMsg(data.message || "Update failed.");
+      }
+    } catch (err) {
+      setMsgType("error");
+      setMsg("Network error. Check server.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className={styles.profileCard}>
       <div className={styles.profilePicContainer}>
-        {profilePic ? (
-          <img src={profilePic} alt="Profile" className={styles.profilePic} />
+        {user.profilePic ? (
+          <img src={user.profilePic} alt="Profile" className={styles.profilePic} />
         ) : (
-          <div className={styles.profilePicPlaceholder}>No Image</div>
+          <div className={styles.profilePicPlaceholder}>👤</div>
         )}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handlePicChange}
-          className={styles.fileInput}
-        />
+        {editing && (
+          <>
+            <input
+              type="file"
+              accept="image/*"
+              id="fileInput"
+              style={{ display: "none" }}
+              onChange={handlePicChange}
+            />
+            <label htmlFor="fileInput" className={styles.editIconOverlay}>
+              <FontAwesomeIcon icon={faEdit} />
+            </label>
+          </>
+        )}
       </div>
-      {!showForm ? (
+
+      {!editing ? (
         <div className={styles.profileInfo}>
-          <p className={styles.name}>{name}</p>
-          <p className={styles.email}>{email}</p>
-          <FontAwesomeIcon
-            icon={faEdit}
-            className={styles.editIcon}
-            onClick={() => setShowForm(true)}
-          />
+          <p className={styles.name}>{user.name}</p>
+          <p className={styles.email}>{user.email}</p>
+
+          {/* Message above Edit button */}
+          {msg && <p className={styles.infoMsg}>{msg}</p>}
+
+          <button
+            className={styles.editBtn}
+            onClick={() => setEditing(true)}
+          >
+            <FontAwesomeIcon icon={faEdit} />
+          </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className={styles.editForm}>
+        <form onSubmit={handleSave} className={styles.editForm}>
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Name"
-            className={styles.inputField}
+            defaultValue={user.name}
+            onChange={(e) => setNewName(e.target.value)}
+            className={`${styles.inputField} form-control mb-2`}
           />
           <input
             type="email"
-            value={email}
-            onChange={(e) => setEmailAddress(e.target.value)}
-            placeholder="Email"
-            className={styles.inputField}
-            disabled // Disable the email field
+            value={user.email}
+            disabled
+            className={`${styles.inputField} form-control mb-2`}
           />
-          <button type="submit" className={styles.primaryButton} disabled={isSaving}>
-            {isSaving ? 'Saving...' : 'Save'}
-          </button>
+
+          {/* Message above Save/Cancel buttons */}
+          {msg && <p className={styles.infoMsg}>{msg}</p>}
+
+          <div className={styles.buttonGroup}>
+            <button
+              type="submit"
+              className={`${styles.editBtn} m-1`}
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "Save"}
+            </button>
+            <button
+              type="button"
+              className={`${styles.cancelButton} m-1`}
+              onClick={() => setEditing(false)}
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       )}
     </div>

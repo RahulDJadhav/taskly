@@ -60,6 +60,11 @@ const Header = ({ onAddClick, onLogout, tasks, onOpenAdmin }) => {
         </form>
 
         <div className='d-flex align-items-center justify-content-end'>
+          {localStorage.getItem('userRole') === 'admin' && (
+            <button className="btn btn-outline-primary me-3" onClick={onOpenAdmin}>
+              Admin Panel
+            </button>
+          )}
           <AddButton
             onClick={onAddClick}
             className="me-4 btn-primary-taskly text-white"
@@ -109,11 +114,7 @@ const Header = ({ onAddClick, onLogout, tasks, onOpenAdmin }) => {
               </div>
             )}
           </div>
-          {localStorage.getItem('userRole') === 'admin' && (
-            <button className="btn btn-outline-primary me-3" onClick={onOpenAdmin}>
-              Admin Panel
-            </button>
-          )}
+
           <FontAwesomeIcon icon={faSignOutAlt} className="me-2" style={{ cursor: 'pointer' }} title="Logout" onClick={onLogout} />
         </div>
       </div>
