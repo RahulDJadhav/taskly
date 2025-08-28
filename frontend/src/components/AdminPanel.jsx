@@ -10,18 +10,18 @@ export default function AdminPanel({ onClose }) {
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [priorityFilter, setPriorityFilter] = useState("All");
+
+  const filteredTasks = tasks.filter(t =>
+    priorityFilter === "All" || t.priority === priorityFilter
+  );
+
   const [itemsPerPage] = useState(5);
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
-  const currentTasks = tasks.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(tasks.length / itemsPerPage);
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
+  const currentTasks = filteredTasks.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(filteredTasks.length / itemsPerPage);
   // Fetch users
   useEffect(() => {
     fetch(`${API_BASE}getUsers.php`)
@@ -41,6 +41,28 @@ export default function AdminPanel({ onClose }) {
       fetchTasks(); // reload all tasks if search box is empty
     }
   }, [q]);
+
+  const calculateDaysLeft = (dueDate) => {
+    if (!dueDate) return '';
+
+    const today = new Date();
+    const due = new Date(dueDate);
+    today.setHours(0, 0, 0, 0);
+    due.setHours(0, 0, 0, 0);
+
+    const diffTime = due - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays > 0) return `${diffDays} day${diffDays > 1 ? 's' : ''} left`;
+    if (diffDays === 0) return "Due today";
+    return `Overdue by ${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? 's' : ''}`;
+  };
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   const fetchTasks = () => {
     setLoading(true);
@@ -101,7 +123,7 @@ export default function AdminPanel({ onClose }) {
               ))}
             </select>
           </div>
-          <div className="col-md-3">
+          <div className="col-md-2">
             <label className="form-label fw-semibold">Status</label>
             <select className="form-select" value={status} onChange={e => setStatus(e.target.value)}>
               <option value="">All</option>
@@ -112,7 +134,24 @@ export default function AdminPanel({ onClose }) {
               <option value="Completed">Completed</option>
             </select>
           </div>
-          <div className="col-md-4">
+          <div className="col-md-2">
+            <label className="form-label fw-semibold"> Priority:</label>
+            <select
+              className="form-select"
+              value={priorityFilter}
+              onChange={(e) => {
+                setPriorityFilter(e.target.value);
+                setCurrentPage(1); // reset to page 1 after filter change
+              }}
+            >
+              <option value="All">All</option>
+              <option value="Urgent">Urgent</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          <div className="col-md-3">
             <label className="form-label fw-semibold">Search</label>
             <input
               className="form-control"
@@ -132,7 +171,7 @@ export default function AdminPanel({ onClose }) {
       {/* Main Table */}
       <div className="card shadow-sm border-0">
         <div className="card-body p-0">
-          {tasks.length === 0 ? (
+          {filteredTasks.length === 0 ? (
             // <p className="text-muted p-3 text-center">No tasks found.</p>
             <div className="text-center py-5">
               <img
@@ -153,6 +192,7 @@ export default function AdminPanel({ onClose }) {
                       <th>User</th>
                       <th>Title</th>
                       <th>Due</th>
+                      <th>Days Left</th>
                       <th>Priority</th>
                       <th>Status</th>
                       <th>Flags</th>
@@ -168,6 +208,12 @@ export default function AdminPanel({ onClose }) {
                         </td>
                         <td>{t.title}</td>
                         <td><span className="text-muted small">{t.due_date || '-'}</span></td>
+                        <td>
+                          <span className={`fw-semibold small 
+                            ${calculateDaysLeft(t.due_date).includes("Overdue") ? "text-danger" : "text-success"}`}>
+                            {calculateDaysLeft(t.due_date)}
+                          </span>
+                        </td>
                         <td>
                           <span className={`badge ${t.priority === 'High' ? 'bg-danger' :
                             t.priority === 'Medium' ? 'bg-warning text-dark' :
