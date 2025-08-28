@@ -368,7 +368,12 @@ const App = () => {
       <div className="d-flex flex-grow-1">
         {/* Sidebar */}
         <div className="col-md-2 p-3">
-          <Sidebar />
+          <Sidebar
+            activeFilter={activeFilter}
+            onFilterChange={handleFilterChange}
+            taskCounts={taskCounts}
+            showAdminPanel={showAdmin}
+          />
         </div>
 
         {/* Main Content */}
@@ -392,8 +397,6 @@ const App = () => {
                   onToggleFavorite={handleToggleFavorite}
                   onToggleImportant={handleToggleImportant}
                   activeFilter={activeFilter}
-                  onFilterChange={handleFilterChange}
-                  taskCounts={taskCounts}
                 />
               )}
             </div>

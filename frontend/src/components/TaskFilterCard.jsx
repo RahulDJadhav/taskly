@@ -13,7 +13,7 @@ const TaskFilterCard = ({ activeFilter, onFilterChange, taskCounts }) => {
   const taskIcons = [faList, farStar, farHeart, faSquareCheck, faClock];
 
   return (
-    <div className="card shadow-sm rounded-4 p-3 w-75 border-0">
+    <div className="card shadow-sm border-0">
       <ul className="list-group list-group-flush">
         {
           taskItems.map((item, index) => ( // Changed 'task' to 'item' to avoid confusion with task object

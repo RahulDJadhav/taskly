@@ -98,50 +98,6 @@ const CreateTaskForm = forwardRef(({ onSubmit, onUpdate, onEdit }, ref) => {
 
   }));
 
-  //  Form submit
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-
-  //   const today = new Date().toISOString().split("T")[0];
-
-  //   if (dueDate < today) {
-  //     alert("Due date cannot be in the past.");
-  //     return;
-  //   }
-
-  //   if (startDate && dueDate && dueDate < startDate) {
-  //     alert("Due date cannot be earlier than start date.");
-  //     return;
-  //   }
-
-  //   const taskData = {
-  //     id: editingId || Date.now(),
-  //     title: taskTitle,
-  //     startDate: startDate,
-  //     dueDate: dueDate,
-  //     description,
-  //     priority: priority,
-  //     status: status,
-  //     assignee: assignee
-  //   };
-
-  //   if (editingId) {
-  //     onUpdate && onUpdate(taskData);
-  //   } else {
-  //     onSubmit && onSubmit(taskData);
-  //   }
-
-  //   modalInstanceRef.current.hide();
-
-  //   setEditingId(null);
-  //   setTaskTitle('');
-  //   setStartDate('');
-  //   setDueDate('');
-  //   setDescription('');
-  //   setPriority('');
-  //   setStatus('');
-  //   setAssignee('');
-  // };
   const handleSubmit = (e) => {
     e.preventDefault();
 
